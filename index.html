@@ -39,9 +39,9 @@ tbody tr{border-bottom:1px solid var(--grid)}
 .time{position:sticky;left:0;background:var(--panel);border-right:1px solid var(--border);font-weight:600}
 td{padding:8px;min-width:130px;vertical-align:top;position:relative}
 td.cell{cursor:pointer;background:var(--cell)} td.cell:hover{background:var(--hover)}
-td.locked{background:#e8eefb;color:#334155;cursor:not-allowed}
 .indisp{background:var(--indisp);color:#64748b}
 .tag{display:inline-flex;gap:6px;align-items:center;padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid #0001;box-shadow:inset 0 1px 0 #fff4}
+/* Chat */
 #chatBtn{position:fixed;right:16px;bottom:16px;background:var(--blue);color:white;border:none;border-radius:999px;padding:12px 16px;box-shadow:0 8px 24px rgba(2,6,23,.25);z-index:70}
 #chatPanel{position:fixed;right:16px;bottom:76px;width:min(360px,92vw);max-height:70vh;background:var(--panel);border:1px solid var(--border);border-radius:16px;display:none;flex-direction:column;overflow:hidden;z-index:70;box-shadow:0 20px 60px rgba(2,6,23,.35)}
 #chatHeader{padding:12px;border-bottom:1px solid var(--border);font-weight:600}
@@ -52,7 +52,7 @@ td.locked{background:#e8eefb;color:#334155;cursor:not-allowed}
 #chatInputBar{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
 .quick{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px;border-top:1px dashed var(--border)}
 .quick button{font-size:12px;padding:6px 8px}
-.drop-target{outline:2px solid var(--blue);outline-offset:-2px}
+#toast{position:fixed;right:16px;bottom:16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;box-shadow:0 10px 30px rgba(2,6,23,.15);display:none;z-index:50}
 </style>
 </head>
 <body>
@@ -170,17 +170,19 @@ td.locked{background:#e8eefb;color:#334155;cursor:not-allowed}
   <div id="chatMessages"></div>
   <div class="quick" id="chatQuick"></div>
   <div id="chatInputBar">
-    <input id="chatInput" placeholder="Ej: 'Nuria martes 18:00' · 'repite jueves' · 'borra sábado 16:00'"/>
+    <input id="chatInput" placeholder="Ej: 'Nuria martes 18:00' · 'repaso matemáticas lunes 10:00 90' · 'borra sábado 16:00'"/>
     <button id="chatSend">Enviar</button>
   </div>
 </div>
+
+<div id="toast"></div>
 
 <script>
 // ===== PWA =====
 if ('serviceWorker' in navigator) { window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js').catch(console.error)); }
 
 // ===== Util =====
-function toast(msg,ms=1500){ console.log(msg); }
+function toast(msg,ms=1500){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._to); t._to=setTimeout(()=>t.style.display='none',ms); }
 function loadJSON(k,def){ try{const x=localStorage.getItem(k); return x?JSON.parse(x):def;}catch(e){return def;} }
 function saveJSON(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
 
@@ -229,6 +231,16 @@ function renderGrid(){
       const td=document.createElement('td'); td.dataset.day=day; td.dataset.time=time;
       td.className = isUnavailable(day,time) ? 'cell indisp' : 'cell';
       td.addEventListener('click',()=>openEditor(td));
+      // drops
+      td.addEventListener('dragover', e=>{ e.preventDefault(); td.classList.add('drop-target'); });
+      td.addEventListener('dragleave', ()=> td.classList.remove('drop-target'));
+      td.addEventListener('drop', e=>{
+        e.preventDefault(); td.classList.remove('drop-target');
+        const subj = e.dataTransfer.getData('text/subject'); if(!subj) return;
+        const dIdx = dayIndex(td.dataset.day); const r = SLOTS.indexOf(td.dataset.time);
+        for(let i=0;i<2;i++){ const c=tbody.children[r+i]?.children[dIdx+1]; if(!c) continue; writeCell(c,'t-blue','Uni — '+subj,{type:'study',subject:subj,plannedMin:30}); }
+        saveWeek();
+      });
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
@@ -239,8 +251,8 @@ function renderGrid(){
 function subjects(){ return loadJSON(KEYS.subjects, []); }
 function setSubjects(list){ saveJSON(KEYS.subjects, list); renderSubjects(); renderTaskSubjects(); }
 function renderSubjects(){
-  const list=subjects();
   const div=document.getElementById('subjectsList'); div.innerHTML='';
+  const list=subjects();
   if(!list.length){ div.innerHTML='<div class="sub">(Aún no hay asignaturas)</div>'; return; }
   list.forEach((s,idx)=>{
     const row=document.createElement('div'); row.style.display='flex'; row.style.gap='8px'; row.style.alignItems='center';
@@ -262,75 +274,57 @@ document.getElementById('addSubject').addEventListener('click',()=>{
 });
 function renderTaskSubjects(){ const sel=document.getElementById('taskSubject'); sel.innerHTML=''; (subjects()||[]).forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; sel.appendChild(o); }); }
 
-// ===== Drag & drop to grid =====
-function enableDrops(){
-  tbody.querySelectorAll('td').forEach(td=>{
-    td.addEventListener('dragover', e=>{ e.preventDefault(); td.classList.add('drop-target'); });
-    td.addEventListener('dragleave', ()=> td.classList.remove('drop-target'));
-    td.addEventListener('drop', async e=>{
-      e.preventDefault(); td.classList.remove('drop-target');
-      const subj = e.dataTransfer.getData('text/subject'); if(!subj) return;
-      const tr = td.parentElement; const rowIdx = Array.from(tbody.children).indexOf(tr); const colIdx = td.cellIndex;
-      const need = 2; // 60 min
-      // overwrite simply
-      for(let i=0;i<need;i++){
-        const cell = tbody.children[rowIdx+i]?.children[colIdx];
-        if(!cell) break; cell.className='cell'; cell.innerHTML='';
-        const tag=document.createElement('span'); tag.className='tag'; tag.textContent='Uni — '+subj; cell.appendChild(tag);
-        const meta=document.createElement('span'); meta.className='meta'; meta.textContent=JSON.stringify({type:'study',subject:subj,plannedMin:30}); cell.appendChild(meta);
-      }
-      saveWeek();
-    });
-  });
-}
-
-// ===== Teacher hours (strict) =====
-function teacherAllowed(day){
-  if(['Martes','Jueves'].includes(day)) return ['18:00','19:00','20:00'];
-  if(['Sábado','Domingo'].includes(day)) return ['16:00','17:00','18:00'];
-  return [];
-}
+// ===== Helpers
+function writeCell(td, cls, text, meta){ td.className='cell'; td.innerHTML=''; const tag=document.createElement('span'); tag.className='tag '+cls; tag.textContent=text; td.appendChild(tag); const m=document.createElement('span'); m.className='meta'; m.textContent=JSON.stringify(meta); td.appendChild(m); }
+function metaOf(td){ const m=td.querySelector('.meta'); if(!m) return null; try{return JSON.parse(m.textContent||'{}');}catch(_){return null;} }
+function dayTokToName(tok){ tok=tok.toLowerCase(); if(tok.startsWith('lu'))return 'Lunes'; if(tok.startsWith('ma') && tok!='may')return 'Martes'; if(tok.startsWith('mi'))return 'Miércoles'; if(tok.startsWith('ju'))return 'Jueves'; if(tok.startsWith('vi'))return 'Viernes'; if(tok.startsWith('sa'))return 'Sábado'; if(tok.startsWith('do'))return 'Domingo'; return null; }
+function parseTime(t){ const m=t.match(/^(\d{1,2})(?:[:h](\d{2}))?$/); if(!m) return null; let H=parseInt(m[1],10), M=m[2]?parseInt(m[2],10):0; if(H<0||H>23) return null; if(M!==0 && M!==30) M=0; return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'); }
+function teacherAllowed(day){ if(['Martes','Jueves'].includes(day)) return ['18:00','19:00','20:00']; if(['Sábado','Domingo'].includes(day)) return ['16:00','17:00','18:00']; return []; }
 async function addTeacherBlock(teacher, day, requested){
   const allowed=teacherAllowed(day); if(!allowed.length){ toast('Solo Ma/Ju 18–20 o Sa/Do 16–18'); return false; }
   const want=SLOTS.indexOf(requested||allowed[0]);
   const chosen = requested && allowed.includes(requested) ? requested : (allowed.find(h=>SLOTS.indexOf(h)>=want) || allowed[0]);
-  const startIdx=SLOTS.indexOf(chosen); const dIdx=dayIndex(day);
-  for(let i=0;i<2;i++){
-    const td=tbody.children[startIdx+i]?.children[dIdx+1];
-    if(!td) continue; td.className='cell'; td.innerHTML='';
-    const tag=document.createElement('span'); tag.className='tag'; tag.textContent=`${teacher} — ${chosen}`; td.appendChild(tag);
-    const meta=document.createElement('span'); meta.className='meta'; meta.textContent=JSON.stringify({type:'teacher',teacher,plannedMin:30}); td.appendChild(meta);
-  }
+  const startIdx=SLOTS.indexOf(chosen); const dIdx=DAYS.indexOf(day);
+  for(let i=0;i<2;i++){ const td=tbody.children[startIdx+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,(teacher==='Nuria')?'t-yellow':'t-orange', `${teacher} — ${chosen}`, {type:'teacher',teacher,plannedMin:30}); }
   saveWeek(); return true;
 }
 
-// ===== Editor mínimo =====
+// ===== Editor (no re-abrir en misma celda consecutiva)
+let lastOpenedCell=null;
 function openEditor(cell){
+  if(cell===lastOpenedCell){ lastOpenedCell=null; return; }
+  lastOpenedCell=cell;
   const day=cell.dataset.day, clickedTime=cell.dataset.time;
-  const ed=document.createElement('div'); ed.style.position='absolute'; ed.style.background='var(--panel)'; ed.style.border='1px solid var(--border)'; ed.style.borderRadius='10px'; ed.style.padding='8px'; const r=cell.getBoundingClientRect(); ed.style.left=(window.scrollX+r.left+6)+'px'; ed.style.top=(window.scrollY+r.top+6)+'px';
+  const ed=document.createElement('div'); ed.style.position='absolute'; ed.style.zIndex='10'; ed.style.background='var(--panel)'; ed.style.border='1px solid var(--border)'; ed.style.borderRadius='10px'; ed.style.padding='10px'; ed.style.boxShadow='0 8px 24px rgba(2,6,23,.12)';
+  const rect=cell.getBoundingClientRect(); ed.style.left=(window.scrollX+rect.left+6)+'px'; ed.style.top=(window.scrollY+rect.top+6)+'px';
   const typeSel=document.createElement('select'); ['(tipo)','Clase — Profesor/a','Universidad — Repaso','Descanso'].forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; typeSel.appendChild(o); });
   const durSel=document.createElement('select'); ['30','60','90','120'].forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m+' min'; durSel.appendChild(o);}); durSel.value='60';
   const profSel=document.createElement('select'); ['','Nuria','Juan Carlos'].forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n||'— profesor/a —'; profSel.appendChild(o); });
-  const subjSel=document.createElement('select'); const ph=document.createElement('option'); ph.value=''; ph.textContent='— asignatura —'; subjSel.appendChild(ph); (subjects()||[]).forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; subjSel.appendChild(o); });
+  const hourSel=document.createElement('select'); const allowed = teacherAllowed(day); if(!allowed.length){ hourSel.disabled=true; } else { const ph=document.createElement('option'); ph.value=''; ph.textContent='— hora —'; hourSel.appendChild(ph); allowed.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; hourSel.appendChild(o); }); }
+  const subjSel=document.createElement('select'); const ph=document.createElement('option'); ph.value=''; ph.textContent='— asignatura —'; subjSel.appendChild(ph);
+  (subjects()||[]).forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; subjSel.appendChild(o); });
   const ok=document.createElement('button'); ok.textContent='Aplicar'; const cancel=document.createElement('button'); cancel.textContent='Cancelar'; cancel.style.marginLeft='6px';
-  ok.addEventListener('click', async ()=>{
+  ok.addEventListener('click',async()=>{
     const type=typeSel.value;
     if(type==='Clase — Profesor/a'){
-      if(!profSel.value) return;
-      await addTeacherBlock(profSel.value, day, clickedTime);
+      if(!profSel.value) return toast('Elige profesor/a');
+      const chosen = hourSel.disabled || !hourSel.value ? (teacherAllowed(day)[0]||null) : hourSel.value;
+      if(!chosen) return toast('Solo Ma/Ju 18–20 o Sa/Do 16–18');
+      await addTeacherBlock(profSel.value, day, chosen);
     }else if(type==='Universidad — Repaso'){
-      const slots=Math.ceil((parseInt(durSel.value,10)||60)/30); const dIdx=dayIndex(day); const start=SLOTS.indexOf(clickedTime);
-      for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; td.className='cell'; td.innerHTML=''; const t=document.createElement('span'); t.className='tag'; t.textContent=subjSel.value?('Uni — '+subjSel.value):'Universidad — Repaso'; td.appendChild(t); const m=document.createElement('span'); m.className='meta'; m.textContent=JSON.stringify({type:'study',subject:subjSel.value||null,plannedMin:30}); td.appendChild(m); }
+      const dur=parseInt(durSel.value,10); const slots=Math.ceil(dur/30); const dIdx=DAYS.indexOf(day); const start=SLOTS.indexOf(clickedTime);
+      for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,'t-blue', subjSel.value?('Uni — '+subjSel.value):'Universidad — Repaso',{type:'study',subject:subjSel.value||null,plannedMin:30}); }
       saveWeek();
     }else if(type==='Descanso'){
-      const dIdx=dayIndex(day); const start=SLOTS.indexOf(clickedTime); const slots=Math.ceil((parseInt(durSel.value,10)||30)/30);
-      for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; td.className='cell'; td.innerHTML=''; const t=document.createElement('span'); t.className='tag'; t.textContent='Descanso'; td.appendChild(t); const m=document.createElement('span'); m.className='meta'; m.textContent=JSON.stringify({type:'rest',plannedMin:30}); td.appendChild(m); }
+      const dur=parseInt(durSel.value,10); const slots=Math.ceil(dur/30); const dIdx=DAYS.indexOf(day); const start=SLOTS.indexOf(clickedTime);
+      for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,'t-green','Descanso',{type:'rest',plannedMin:30}); }
       saveWeek();
-    }
-    document.body.removeChild(ed);
+    }else return toast('Selecciona un tipo');
+    document.body.removeChild(ed); lastOpenedCell=null;
   });
-  cancel.addEventListener('click',()=> document.body.removeChild(ed));
-  ed.appendChild(typeSel); ed.appendChild(durSel); ed.appendChild(document.createElement('br')); ed.appendChild(profSel); ed.appendChild(document.createElement('br')); ed.appendChild(subjSel); ed.appendChild(document.createElement('br')); ed.appendChild(ok); ed.appendChild(cancel); document.body.appendChild(ed);
+  cancel.addEventListener('click',()=>{ document.body.removeChild(ed); lastOpenedCell=null; });
+  ed.appendChild(typeSel); ed.appendChild(durSel); ed.appendChild(document.createElement('br')); ed.appendChild(profSel); ed.appendChild(hourSel); ed.appendChild(document.createElement('br')); ed.appendChild(subjSel); ed.appendChild(document.createElement('br')); ed.appendChild(ok); ed.appendChild(cancel);
+  document.body.appendChild(ed);
 }
 
 // ===== Semana / persistencia =====
@@ -342,14 +336,15 @@ function saveWeek(){
   }); saveJSON(key(),data); renderSummary();
 }
 function loadWeek(){
-  renderGrid(); const raw=loadJSON(key(),null);
-  if(raw){ raw.forEach((row,rIdx)=>{ const tr=tbody.children[rIdx]; DAYS.forEach((day,i)=>{ const td=tr.children[i+1]; td.innerHTML=row[day].html; td.className=row[day].cls||'cell'; }); }); }
-  enableDrops();
+  renderGrid();
+  const raw=loadJSON(key(),null);
+  if(raw){ raw.forEach((row,rIdx)=>{ const tr=tbody.children[rIdx]; DAYS.forEach((day,i)=>{ const td=tr.children[i+1]; if(!td) return; td.innerHTML=row[day].html; td.className=row[day].cls||'cell'; }); }); }
 }
-document.getElementById('saveBtn').addEventListener('click',()=>{ saveWeek(); });
+document.getElementById('saveBtn').addEventListener('click',()=>{ saveWeek(); toast('Semana guardada ✔'); });
 document.getElementById('clearBtn').addEventListener('click',()=>{ renderGrid(); saveWeek(); });
+weekSelect.addEventListener('change',()=>{ currentWeek=weekSelect.value; loadWeek(); });
 
-// ===== Export =====
+// ===== Export CSV & ICS =====
 document.getElementById('exportBtn').addEventListener('click',()=>{
   const rows=[["Hora",...DAYS]];
   tbody.querySelectorAll('tr').forEach((tr,rowIdx)=>{
@@ -358,7 +353,7 @@ document.getElementById('exportBtn').addEventListener('click',()=>{
       const td=tr.children[i+1];
       const txt=td.querySelector('.tag')?.textContent || '';
       const note=td.querySelector('.meta')?.textContent || '';
-      line.push('"'+(txt + (note? ' — '+note:'' )).replaceAll('"','""')+'"');
+      line.push('"' + (txt + (note? ' — '+note:'' )).replaceAll('"','""') + '"');
     });
     rows.push(line);
   });
@@ -366,46 +361,75 @@ document.getElementById('exportBtn').addEventListener('click',()=>{
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download=`${currentWeek.replace(' ','_')}_horario.csv`; a.click();
 });
 
-// ===== Chatbot ("chatboy") =====
+document.getElementById('exportICSBtn').addEventListener('click',()=>{
+  const s=loadJSON(KEYS.student,{}); if(!s.monday) return toast('Define "Inicio de semana (Lunes)" en la portada');
+  const startDate=new Date(s.monday+'T00:00:00'); function dayOffset(d){ return new Date(startDate.getTime() + (DAYS.indexOf(d))*86400000); }
+  function fmt(dt){ const y=dt.getFullYear(); const m=String(dt.getMonth()+1).padStart(2,'0'); const d=String(dt.getDate()).padStart(2,'0'); const H=String(dt.getHours()).padStart(2,'0'); const M=String(dt.getMinutes()).padStart(2,'0'); return `${y}${m}${d}T${H}${M}00`; }
+  // Merge contiguous equal blocks
+  let ics='BEGIN:VCALENDAR\\nVERSION:2.0\\nCALSCALE:GREGORIAN\\nMETHOD:PUBLISH\\nPRODID:-//Academia Flow//Plan//ES\\n';
+  const uidBase=Date.now();
+  DAYS.forEach((day,di)=>{
+    for(let r=0;r<SLOTS.length;r++){
+      const td=tbody.children[r]?.children[di+1]; if(!td) continue;
+      const metaEl=td.querySelector('.meta'); const tag=td.querySelector('.tag'); if(!metaEl||!tag) continue;
+      const meta=JSON.parse(metaEl.textContent||'{}'); const title=tag.textContent;
+      let end=r+1;
+      while(end<SLOTS.length){
+        const td2=tbody.children[end]?.children[di+1]; const m2=td2?.querySelector('.meta'); const t2=td2?.querySelector('.tag');
+        if(!m2||!t2) break;
+        if(m2.textContent!==metaEl.textContent || t2.textContent!==tag.textContent) break;
+        end++;
+      }
+      const startTime=SLOTS[r]; const slots=end-r; const dur=slots*30;
+      const dayDate=dayOffset(day); const [h,m]=startTime.split(':').map(x=>+x); const st=new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), h, m); const en=new Date(st.getTime()+dur*60000);
+      const uid=`af-${uidBase}-${di}-${r}`;
+      ics+=`BEGIN:VEVENT\\nUID:${uid}\\nSUMMARY:${title}\\nDTSTAMP:${fmt(new Date())}\\nDTSTART:${fmt(st)}\\nDTEND:${fmt(en)}\\nDESCRIPTION:${(meta.note||'')}\\nEND:VEVENT\\n`;
+      r=end-1;
+    }
+  });
+  ics+='END:VCALENDAR';
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='plan_estudio.ics'; a.click();
+});
+
+// ===== Chatbot =====
 const chatBtn=document.getElementById('chatBtn'); const chatPanel=document.getElementById('chatPanel'); const chatMessages=document.getElementById('chatMessages'); const chatInput=document.getElementById('chatInput'); const chatSend=document.getElementById('chatSend'); const quickBar=document.getElementById('chatQuick');
 chatBtn.addEventListener('click',()=>{ chatPanel.style.display = (chatPanel.style.display==='flex')?'none':'flex'; if(chatPanel.style.display!=='flex'){ chatPanel.style.display='flex'; chatPanel.style.flexDirection='column'; } });
 function pushMsg(who, text){ const row=document.createElement('div'); row.className='msg '+(who==='you'?'you':'bot'); const b=document.createElement('div'); b.className='bubble'; b.textContent=text; row.appendChild(b); chatMessages.appendChild(row); chatMessages.scrollTop=chatMessages.scrollHeight; }
-function dayTokenToName(tok){ tok=tok.toLowerCase(); if(tok.startsWith('lu'))return 'Lunes'; if(tok.startsWith('ma') && tok!=='may')return 'Martes'; if(tok.startsWith('mi'))return 'Miércoles'; if(tok.startsWith('ju'))return 'Jueves'; if(tok.startsWith('vi'))return 'Viernes'; if(tok.startsWith('sa'))return 'Sábado'; if(tok.startsWith('do'))return 'Domingo'; return null; }
-function parseTime(t){ const m=t.match(/^(\d{1,2})(?:[:h](\d{2}))?$/); if(!m) return null; let H=parseInt(m[1],10), M=m[2]?parseInt(m[2],10):0; if(H<0||H>23) return null; if(M!==0 && M!==30) M=0; return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'); }
 function replyBot(text){
-  const low=text.toLowerCase().trim();
-  if(/ayuda|help|comandos/.test(low)){
-    pushMsg('bot',"Comandos: 'Nuria martes 18:00', 'Juan Carlos domingo 16:00', 'repite jueves', 'borra sábado 16:00', 'exporta csv'.");
-    return;
-  }
-  // colocar profesor
-  let m = low.match(/(nuria|juan\s*car\w*)\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\s+(\d{1,2}[:h]\d{2}|\d{1,2})/i);
+  const tok=text.toLowerCase().trim();
+  if(/ayuda|help|comandos/.test(tok)){ pushMsg('bot',"Comandos: 'Nuria martes 18:00', 'Juan Carlos domingo 16:00', 'repaso matematicas lunes 10:00 90', 'borra sábado 16:00', 'exporta ics', 'exporta csv'."); return; }
+  if(/exporta\\s+ics/.test(tok)){ document.getElementById('exportICSBtn').click(); pushMsg('bot','He generado el ICS.'); return; }
+  if(/exporta\\s+csv/.test(tok)){ document.getElementById('exportBtn').click(); pushMsg('bot','He generado el CSV.'); return; }
+  // profesor
+  let m = tok.match(/(nuria|juan\\s*car\\w*)\\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\\s+(\\d{1,2}[:h]\\d{2}|\\d{1,2})/i);
+  const dayTokToName=(x)=>{ x=x.toLowerCase(); if(x.startsWith('lu'))return 'Lunes'; if(x.startswith('ma') and x!='may')return 'Martes'; return {'mi':'Miércoles','ju':'Jueves','vi':'Viernes','sa':'Sábado','do':'Domingo'}[x.slice(0,2)]||null; };
+  const parseTime=(t)=>{ const mm=t.match(/^(\\d{1,2})(?:[:h](\\d{2}))?$/); if(!mm) return null; let H=parseInt(mm[1],10), M=mm[2]?parseInt(mm[2],10):0; if(H<0||H>23) return null; if(M!=0 && M!=30) M=0; return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'); };
   if(m){
-    const teacher = /nuria/i.test(m[1]) ? 'Nuria' : 'Juan Carlos'; const day = dayTokenToName(m[2]); const hour=parseTime(m[3]);
-    if(!day||!hour) return pushMsg('bot','No entiendo el día/hora.');
-    const ok = addTeacherBlock(teacher, day, hour);
-    if(ok && ok.then){ ok.then(res=>{ pushMsg('bot', res?'He programado la clase.':'No se pudo colocar.'); saveWeek(); }); } else { pushMsg('bot', ok?'He programado la clase.':'No se pudo colocar.'); }
-    return;
+    const teacher = /nuria/i.test(m[1]) ? 'Nuria' : 'Juan Carlos'; const day = dayTokToName(m[2]); const hour=parseTime(m[3]);
+    if(!day||!hour) return pushMsg('bot','No entiendo el día/hora.'); addTeacherBlock(teacher, day, hour).then(ok=> pushMsg('bot', ok?'He programado la clase.':'No se pudo colocar.')); return;
+  }
+  // repaso
+  m = tok.match(/(repaso|estudio)\\s+([\\wáéíóúñ]+)\\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\\s+(\\d{1,2}[:h]\\d{2}|\\d{1,2})\\s+(\\d{2,3})/i);
+  if(m){
+    const subj=m[2]; const day=dayTokToName(m[3]); const hour=parseTime(m[4]); const dur=parseInt(m[5],10); if(!day||!hour) return pushMsg('bot','No entiendo el día/hora.');
+    const dIdx=DAYS.indexOf(day); const start=SLOTS.indexOf(hour); const slots=Math.ceil(dur/30);
+    for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,'t-blue','Uni — '+subj,{type:'study',subject:subj,plannedMin:30}); }
+    saveWeek(); pushMsg('bot','He creado el bloque de estudio.'); return;
   }
   // borrar
-  m = low.match(/borra\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\s+(\d{1,2}[:h]\d{2}|\d{1,2})/i);
+  m = tok.match(/borra\\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\\s+(\\d{1,2}[:h]\\d{2}|\\d{1,2})/i);
   if(m){
-    const day=dayTokenToName(m[1]); const hour=parseTime(m[2]); const dIdx=dayIndex(day); const r=SLOTS.indexOf(hour); const td=tbody.children[r]?.children[dIdx+1];
+    const day=dayTokToName(m[1]); const hour=parseTime(m[2]); const dIdx=DAYS.indexOf(day); const r=SLOTS.indexOf(hour); const td=tbody.children[r]?.children[dIdx+1];
     if(td){ td.className='cell'; td.innerHTML=''; saveWeek(); pushMsg('bot','He borrado ese bloque.'); } else pushMsg('bot','No encontré la celda.');
     return;
   }
-  pushMsg('bot','No entendí. Escribe "ayuda" para ver comandos.');
+  pushMsg('bot','No entendí. Escribe "Ayuda" para ver comandos.');
 }
-document.getElementById('chatSend').addEventListener('click',()=>{ const v=chatInput.value.trim(); if(!v) return; pushMsg('you',v); chatInput.value=''; replyBot(v); });
-chatInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ document.getElementById('chatSend').click(); }});
-['Ayuda','Nuria martes 18:00','Juan Carlos domingo 16:00','repite jueves','exporta csv'].forEach(q=>{ const b=document.createElement('button'); b.textContent=q; b.addEventListener('click',()=>{ pushMsg('you',q); replyBot(q); }); quickBar.appendChild(b); });
+document.getElementById('chatBtn').addEventListener('click',()=>{ if(!document.getElementById('chatPanel')._inited){ ['Ayuda','Nuria martes 18:00','Juan Carlos domingo 16:00','repaso matematicas lunes 10:00 90','exporta ics','exporta csv'].forEach(q=>{ const b=document.createElement('button'); b.textContent=q; b.addEventListener('click',()=>{ const i=document.getElementById('chatInput'); i.value=q; document.getElementById('chatSend').click(); }); document.getElementById('chatQuick').appendChild(b); }); document.getElementById('chatPanel')._inited=true; } });
+document.getElementById('chatSend').addEventListener('click',()=>{ const v=document.getElementById('chatInput').value.trim(); if(!v) return; const chatMessages=document.getElementById('chatMessages'); const row=document.createElement('div'); row.className='msg you'; const b=document.createElement('div'); b.className='bubble'; b.textContent=v; row.appendChild(b); chatMessages.appendChild(row); chatMessages.scrollTop=chatMessages.scrollHeight; document.getElementById('chatInput').value=''; replyBot(v); });
 
 // ===== Init =====
-function computeStats(){
-  const res={planned:0, actual:0, tasks:{done:0,total:0}}; const t=loadJSON(KEYS.tasks, {}); Object.values(t).forEach(arr=>arr.forEach(it=>{res.tasks.total++; if(it.done) res.tasks.done++;}));
-  for(let r=0;r<SLOTS.length;r++){ for(let d=0;d<DAYS.length;d++){ const td=tbody.children[r]?.children[d+1]; if(!td) continue; const m=td.querySelector('.meta'); if(!m) continue; try{ const mm=JSON.parse(m.textContent||'{}'); res.planned += mm.plannedMin||30; }catch(_){} } }
-  return res;
-}
+function computeStats(){ const res={planned:0, actual:0, tasks:{done:0,total:0}}; const t=loadJSON(KEYS.tasks, {}); Object.values(t).forEach(arr=>arr.forEach(it=>{res.tasks.total++; if(it.done) res.tasks.done++;})); for(let r=0;r<SLOTS.length;r++){ for(let d=0;d<DAYS.length;d++){ const td=tbody.children[r]?.children[d+1]; if(!td) continue; const m=td.querySelector('.meta'); if(!m) continue; try{ const mm=JSON.parse(m.textContent||'{}'); res.planned += mm.plannedMin||30; }catch(_){} } } return res; }
 function renderSummary(){ const s=computeStats(); document.getElementById('sPlan').textContent=(s.planned/60).toFixed(1)+'h'; document.getElementById('sReal').textContent=(s.actual/60).toFixed(1)+'h'; document.getElementById('sTasks').textContent = s.tasks.total? Math.round(100*s.tasks.done/s.tasks.total)+'%' : '0%'; }
 function init(){ loadStudent(); renderSubjects(); renderTaskSubjects(); renderGrid(); loadWeek(); }
 init();
