@@ -3,222 +3,274 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Academia Flow — Plan + Chatbot (PWA)</title>
+<title>Academia Flow — Plan de Estudio (v6)</title>
 <link rel="manifest" href="manifest.webmanifest"/>
-<meta name="theme-color" content="#2563eb"/>
-<link rel="apple-touch-icon" href="icons/icon-192.png"/>
-<link rel="icon" type="image/png" href="icons/icon-192.png"/>
+<meta name="theme-color" content="#1e40af"/>
 <style>
-:root{
-  --bg:#f6f8fc;--panel:#ffffff;--muted:#94a3b8;--text:#0f172a;--sub:#475569;
-  --blue:#2563eb;--border:#d0d8e4;--grid:#e2e8f0;--cell:#ffffff;--hover:#f1f5f9;
-  --indisp:#eef2f7;
-  --t-red:#fce7e7;--t-yellow:#fff2cc;--t-blue:#dbeafe;--t-green:#dcfce7;--t-pink:#fce7f3;--t-orange:#ffedd5;--t-purple:#ede9fe;
-}
-*{box-sizing:border-box} html,body{height:100%} body{margin:0;background:linear-gradient(180deg,var(--bg),#eef5ff);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
-header{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);z-index:5;border-bottom:1px solid var(--border)}
-.wrap{max-width:1280px;margin:0 auto;padding:16px}
-h1{margin:0 0 4px;font-size:clamp(18px,2.6vw,26px)} .sub{color:var(--sub);font-size:14px}
-nav.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-nav.tabs a{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--panel);text-decoration:none;color:inherit}
-nav.tabs a.active{outline:2px solid var(--blue)}
-.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
-select,button,input,textarea{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px}
-button{cursor:pointer} button:hover{filter:brightness(1.05)}
-.page{display:none}.page.active{display:block}
-.layout{display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start}
-.left{position:sticky;top:150px}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 24px rgba(2,6,23,.06)}
-.card h3{margin:0;padding:14px 16px;border-bottom:1px solid var(--border);font-size:15px;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
-.section{padding:12px 14px;display:grid;gap:10px}
-.grid{overflow:auto;border-radius:16px;border:1px solid var(--border)}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1040px;background:var(--panel);transform-origin:0 0}
-thead th{position:sticky;top:0;background:var(--panel);padding:10px;border-bottom:1px solid var(--border);font-weight:600}
-tbody td, thead th{border-right:1px solid var(--grid)} tbody td:last-child, thead th:last-child{border-right:none}
-tbody tr{border-bottom:1px solid var(--grid)}
-.time{position:sticky;left:0;background:var(--panel);border-right:1px solid var(--border);font-weight:600}
-td{padding:8px;min-width:130px;vertical-align:top;position:relative}
-td.cell{cursor:pointer;background:var(--cell)} td.cell:hover{background:var(--hover)}
-.indisp{background:var(--indisp);color:#64748b}
-.tag{display:inline-flex;gap:6px;align-items:center;padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid #0001;box-shadow:inset 0 1px 0 #fff4}
-/* Chat */
-#chatBtn{position:fixed;right:16px;bottom:16px;background:var(--blue);color:white;border:none;border-radius:999px;padding:12px 16px;box-shadow:0 8px 24px rgba(2,6,23,.25);z-index:70}
-#chatPanel{position:fixed;right:16px;bottom:76px;width:min(360px,92vw);max-height:70vh;background:var(--panel);border:1px solid var(--border);border-radius:16px;display:none;flex-direction:column;overflow:hidden;z-index:70;box-shadow:0 20px 60px rgba(2,6,23,.35)}
-#chatHeader{padding:12px;border-bottom:1px solid var(--border);font-weight:600}
-#chatMessages{padding:10px;overflow:auto;display:grid;gap:8px}
-.msg{display:flex;gap:8px}.msg.you{justify-content:flex-end}
-.bubble{max-width:80%;padding:8px 10px;border-radius:10px;background:#edf2ff;color:#0f172a;border:1px solid #bcd1ff}
-.msg.you .bubble{background:#e2f7e6;border-color:#79d58b}
-#chatInputBar{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
-.quick{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px;border-top:1px dashed var(--border)}
-.quick button{font-size:12px;padding:6px 8px}
-#toast{position:fixed;right:16px;bottom:16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;box-shadow:0 10px 30px rgba(2,6,23,.15);display:none;z-index:50}
+  :root{
+    /* Corporate palette */
+    --bg:#f6f8fc; --panel:#ffffff; --muted:#8a93a6; --text:#0b1220; --sub:#4b5567;
+    --accent:#1e40af; --accent-2:#0ea5a0;
+    --grid:#e5e9f2; --border:#d3dae7; --hover:#eef2fb; --cell:#ffffff;
+    --t-blue:#1e40af; --t-yellow:#f59e0b; --t-orange:#ef7d11; --t-red:#dc2626; --t-green:#16a34a; --t-pink:#be185d;
+    --indisp:#f1f5f9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1325; --panel:#101b34; --muted:#7a86a2; --text:#eef2f7; --sub:#b7c5dd;
+      --accent:#3b82f6; --accent-2:#22c55e;
+      --grid:#213257; --border:#2b3b63; --hover:#1a2a50; --cell:#0f1a36;
+      --indisp:#1b2a4a;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,var(--bg),#e8f0ff);color:var(--text);
+       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
+  header{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);z-index:10;border-bottom:1px solid var(--border)}
+  @media (prefers-color-scheme: dark){ header{background:rgba(16,27,52,.9);} }
+  .wrap{max-width:1280px;margin:0 auto;padding:16px}
+  h1{font-size:clamp(18px,2.6vw,26px);margin:0 0 4px}
+  .sub{color:var(--sub);font-size:14px}
+  nav.tabs{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+  nav.tabs a{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--panel);text-decoration:none;color:inherit}
+  nav.tabs a.active{outline:2px solid var(--accent)}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  select,button,input,textarea{background:var(--panel);color:var(--text);border:1px solid var(--border);
+    border-radius:10px;padding:10px 12px;font-size:14px}
+  button{cursor:pointer} button:hover{filter:brightness(1.05)}
+  .page{display:none} .page.active{display:block}
+  .layout{display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start}
+  .left{position:sticky;top:150px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 24px rgba(2,6,23,.06)}
+  .card h3{margin:0;padding:14px 16px;border-bottom:1px solid var(--border);font-size:15px;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
+  .section{padding:12px 14px;display:grid;gap:10px}
+  .grid{overflow:auto;border-radius:16px;border:1px solid var(--border); transform-origin: top left;}
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1040px;background:var(--panel)}
+  thead th{position:sticky;top:0;background:var(--panel);padding:10px;border-bottom:1px solid var(--border);font-weight:600}
+  tbody td, thead th{border-right:1px solid var(--grid)} tbody td:last-child, thead th:last-child{border-right:none}
+  tbody tr{border-bottom:1px solid var(--grid)}
+  .time{position:sticky;left:0;background:var(--panel);border-right:1px solid var(--border);font-weight:600}
+  td{padding:8px;min-width:130px;vertical-align:top;position:relative}
+  td.cell{cursor:pointer;background:var(--cell)} td.cell:hover{background:var(--hover)}
+  td.locked{background:#e8eefb;color:#334155;cursor:not-allowed}
+  .indisp{background:var(--indisp);color:#64748b}
+  .tag{display:inline-flex;gap:6px;align-items:center;padding:4px 8px;border-radius:8px;font-size:12px;color:#fff;
+       box-shadow:0 1px 0 #fff3, inset 0 -1px 0 #0003}
+  .t-red{background:var(--t-red)} .t-yellow{background:var(--t-yellow);color:#1f2937} .t-blue{background:var(--t-blue)} .t-green{background:var(--t-green)}
+  .t-pink{background:var(--t-pink)} .t-orange{background:var(--t-orange)}
+  .meta{display:none}
+  .drag-ghost{position:fixed;top:0;left:0;pointer-events:none;opacity:.9;transform:translate(-9999px,-9999px);
+    background:var(--panel);border:2px dashed var(--accent);border-radius:10px;padding:6px 10px;box-shadow:0 8px 24px rgba(2,6,23,.18)}
+  .drop-target{outline:2px solid var(--accent); outline-offset:-2px}
+  .resize-handle{position:absolute; right:6px; bottom:4px; width:12px; height:12px; border:1px solid var(--border); border-radius:3px; background:var(--panel);
+    box-shadow:0 1px 0 #fff6; cursor:ns-resize}
+  /* Chatbot */
+  #chatFab{position:fixed; right:18px; bottom:18px; width:56px; height:56px; border-radius:50%; background:var(--accent);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; z-index:100; box-shadow:0 10px 30px rgba(2,6,23,.25)}
+  #chatPanel{position:fixed; right:18px; bottom:86px; width:360px; max-height:70vh; display:none; flex-direction:column; background:var(--panel); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden; z-index:100; box-shadow:0 20px 50px rgba(2,6,23,.28)}
+  #chatHead{padding:10px 12px; font-weight:700; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center}
+  #chatMsgs{padding:10px; display:flex; flex-direction:column; gap:8px; overflow:auto}
+  .msg{padding:8px 10px; border-radius:10px; max-width:85%}
+  .me{align-self:flex-end; background:#e6f0ff}
+  .bot{align-self:flex-start; background:#eef2f7}
+  #chatInputWrap{display:flex; gap:6px; padding:10px; border-top:1px solid var(--border)}
+  #chatInput{flex:1}
+  /* Print */
+  @media print{
+    header, .left, .toolbar, nav.tabs, #chatFab, #chatPanel { display:none !important; }
+    .wrap{ max-width:100%; padding:0; }
+    .page{ display:block !important; }
+  }
+  #installPWA{position:fixed; right:16px; bottom:16px; display:none; z-index:50;
+    padding:10px 14px; border-radius:12px; border:1px solid #cbd5e1; background:#ffffff;
+    box-shadow:0 10px 30px rgba(2,6,23,.15); font-weight:600; cursor:pointer}
 </style>
+<script>
+// --- PWA install ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./service-worker.js').catch(console.error); });
+}
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); deferredPrompt=e;
+  const b=document.getElementById('installBtn'); if(b) b.style.display='inline-block';
+});
+async function installApp(){ if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; const b=document.getElementById('installBtn'); if(b) b.style.display='none'; }
+</script>
+<link rel="apple-touch-icon" href="icons/icon-192.png"/><link rel="icon" type="image/png" href="icons/icon-192.png"/>
 </head>
 <body>
 <header>
-  <div class="wrap">
-    <h1>Academia Flow — Plan + Chatbot</h1>
-    <div class="sub">PWA · Guardado local · CSV/ICS · Notificaciones</div>
-    <nav class="tabs">
-      <a class="tab active" data-page="page-home" href="#home">🏠 Inicio</a>
-      <a class="tab" data-page="page-schedule" href="#schedule">📆 Horario</a>
-      <a class="tab" data-page="page-tasks" href="#tasks">✅ Tareas</a>
-      <a class="tab" data-page="page-summary" href="#summary">📊 Resumen</a>
-    </nav>
-    <div class="toolbar">
-      <button onclick="window.print()">Imprimir</button>
-      <button id="enableNotiBtn">Activar notificaciones</button>
-      <button id="exportICSBtn">Exportar .ics</button>
-      <label>Zoom: <input id="zoomRange" type="range" min="0.8" max="1.4" step="0.05" value="1"></label>
-      <button id="fullBtn">Pantalla completa</button>
-    </div>
-  </div>
+<div class="wrap">
+<h1>Academia Flow — Plan de Estudio</h1>
+<div class="sub">Dashboard · Horario · Tareas · Resumen · PWA + CSV/ICS + impresión</div>
+<nav class="tabs">
+  <a class="tab active" data-page="page-home" href="#home">🏠 Inicio</a>
+  <a class="tab" data-page="page-schedule" href="#schedule">📆 Horario</a>
+  <a class="tab" data-page="page-tasks" href="#tasks">✅ Tareas</a>
+  <a class="tab" data-page="page-summary" href="#summary">📊 Resumen</a>
+</nav>
+<div class="toolbar" id="globalToolbar">
+  <button id="installBtn" style="display:none" onclick="installApp()">Instalar app</button>
+  <button onclick="window.print()">Imprimir</button>
+  <button id="exportICSBtn">Exportar .ics</button>
+  <label>Tema:</label>
+  <select id="themeMode"><option value="auto">Auto</option><option value="light">Claro</option><option value="dark">Oscuro</option></select>
+</div>
+</div>
 </header>
 
 <!-- HOME -->
 <div class="wrap page active" id="page-home">
   <div class="card">
-    <h3>Identificación del estudiante</h3>
+    <h3>Identificación</h3>
     <div class="section">
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <input id="stName" placeholder="Nombre del estudiante"/>
+      <div class="toolbar">
+        <input id="stName" placeholder="Nombre"/>
         <input id="stCourse" placeholder="Curso / Grado"/>
         <input id="stProgram" placeholder="Universidad / Programa"/>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <label>Inicio de semana (Lunes) <input id="mondayDate" type="date" placeholder="yyyy-mm-dd"/></label>
+      <div class="toolbar">
+        <label>Inicio de semana (Lunes): <input id="mondayDate" type="date"/></label>
         <button id="saveStudentBtn">Guardar portada</button>
       </div>
     </div>
   </div>
+  <div class="kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px">
+    <div class="card"><div class="section"><div class="sub">Horas planificadas</div><div id="kpiPlan" style="font-size:24px;font-weight:800">0h</div></div></div>
+    <div class="card"><div class="section"><div class="sub">Horas reales</div><div id="kpiReal" style="font-size:24px;font-weight:800">0h</div></div></div>
+    <div class="card"><div class="section"><div class="sub">% tareas completadas</div><div id="kpiTasks" style="font-size:24px;font-weight:800">0%</div></div></div>
+    <div class="card"><div class="section"><div class="sub">Bloques con profesor</div><div id="kpiTeachers" style="font-size:24px;font-weight:800">0</div></div></div>
+  </div>
 </div>
 
-<!-- SCHEDULE -->
+<!-- HORARIO -->
 <div class="wrap page" id="page-schedule">
   <div class="toolbar" style="margin-bottom:12px">
     <label>Semana: <select id="weekSelect"></select></label>
     <button id="saveBtn">Guardar semana</button>
     <button id="clearBtn">Limpiar semana</button>
     <button id="exportBtn">Exportar CSV</button>
+    <label><input id="snapChk" type="checkbox" checked/> Snap 60/90/120</label>
+    <button id="forceRecBtn">Reaplicar recurrencias</button>
+    <label>Zoom: <input id="zoomRange" type="range" min="0.9" max="1.5" step="0.05"/></label>
   </div>
-
   <div class="layout">
     <aside class="left">
       <div class="card">
         <h3>Asignaturas</h3>
-        <div class="section">
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <input id="subjectName" placeholder="Nombre"/>
-            <input id="subjectColor" type="color" value="#2563eb"/>
-            <label>Objetivo h: <input id="subjectTarget" type="number" step="0.5" min="0" style="width:90px" value="2"/></label>
+        <div class="section" id="subjectsConfig">
+          <div class="toolbar"><input id="subjectName" placeholder="Nombre de asignatura" type="text"/><input id="subjectColor" type="color" value="#1e40af"/></div>
+          <div class="toolbar">
+            <label>Objetivo semanal (h): <input id="subjectTarget" type="number" min="0" step="0.5" value="2" style="width:80px"/></label>
+            <input id="deadlineTitle" placeholder="Añadir entrega (título opcional)" type="text"/>
+            <input id="deadlineDate" type="date"/>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button id="addSubject">Añadir/Actualizar</button>
-          </div>
+          <div class="toolbar"><button id="addSubject">Añadir/Actualizar</button><button id="addDeadline">Añadir entrega</button></div>
           <div id="subjectsList"></div>
-          <div class="sub">💡 Arrastra una asignatura y suéltala en el horario (crea bloque de 60 min).</div>
         </div>
       </div>
+      <div class="card" style="margin-top:12px">
+        <h3>Editor rápido</h3>
+        <div class="section"><div class="sub">Click en celda para crear, doble click en bloque para editar nota. Arrastra para mover. ⌘/Ctrl+clic duplica.</div></div>
+      </div>
     </aside>
-
-    <main class="grid card">
+    <main class="grid card" id="gridWrap">
       <table id="schedule">
-        <thead><tr>
-          <th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th><th>Sábado</th><th>Domingo</th>
-        </tr></thead>
+        <thead><tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th><th>Sábado</th><th>Domingo</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </main>
   </div>
 </div>
 
-<!-- TASKS -->
+<!-- TAREAS -->
 <div class="wrap page" id="page-tasks">
-  <div class="card">
-    <h3>Nueva tarea</h3>
-    <div class="section">
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <select id="taskSubject"></select>
-        <input id="taskTitle" placeholder='Título (p.ej. "Leer cap. 5")'/>
-        <label>Fecha límite <input id="taskDue" type="date"/></label>
-        <label>Estimación <input id="taskEst" type="number" min="0" step="0.5" style="width:80px" value="1"/> h</label>
-      </div>
+  <div class="layout" style="grid-template-columns:1fr 1fr">
+    <div class="card"><h3>Nueva tarea</h3><div class="section">
+      <div class="toolbar"><select id="taskSubject"></select><input id="taskTitle" placeholder="Título"/></div>
+      <div class="toolbar"><label>Fecha límite: <input id="taskDue" type="date"/></label><label>Estimación: <input id="taskEst" type="number" min="0" step="0.5" value="1" style="width:80px"/> h</label></div>
+      <div class="toolbar"><input id="assigneeInput" placeholder="Persona"/><button id="addAssigneeBtn">Añadir al equipo</button><select id="taskAssignee"></select></div>
       <button id="addTaskBtn">Añadir tarea</button>
-    </div>
+    </div></div>
+    <div class="card"><h3>Equipo</h3><div class="section"><div id="teamList"></div></div></div>
   </div>
-  <div class="card" style="margin-top:12px">
-    <h3>Lista de tareas</h3>
-    <div class="section" id="tasksList"></div>
-  </div>
+  <div class="card" style="margin-top:12px"><h3>Lista de tareas</h3><div class="section" id="tasksList"></div></div>
 </div>
 
-<!-- SUMMARY -->
+<!-- RESUMEN -->
 <div class="wrap page" id="page-summary">
-  <div class="card">
-    <h3>Resumen</h3>
-    <div class="section" id="summaryBox">
-      <div>Horas planificadas: <b id="sPlan">0h</b> · Horas reales: <b id="sReal">0h</b> · % tareas completadas: <b id="sTasks">0%</b></div>
+  <div class="card"><h3>Visión general</h3><div class="section">
+    <div class="kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div class="card"><div class="section"><div class="sub">Horas planificadas</div><div id="sPlan" style="font-size:22px;font-weight:800">0h</div></div></div>
+      <div class="card"><div class="section"><div class="sub">Horas reales</div><div id="sReal" style="font-size:22px;font-weight:800">0h</div></div></div>
+      <div class="card"><div class="section"><div class="sub">% tareas completadas</div><div id="sTasks" style="font-size:22px;font-weight:800">0%</div></div></div>
+      <div class="card"><div class="section"><div class="sub">Clases fijas</div><div id="sFixed" style="font-size:22px;font-weight:800">0h</div></div></div>
     </div>
-  </div>
+  </div></div>
+  <div class="card" style="margin-top:12px"><h3>Productividad por persona</h3><div class="section" id="teamStats"></div></div>
 </div>
 
 <!-- Chatbot -->
-<button id="chatBtn">💬</button>
+<button id="chatFab">💬</button>
 <div id="chatPanel">
-  <div id="chatHeader">Asistente — Academia Flow</div>
-  <div id="chatMessages"></div>
-  <div class="quick" id="chatQuick"></div>
-  <div id="chatInputBar">
-    <input id="chatInput" placeholder="Ej: 'Nuria martes 18:00' · 'repaso matemáticas lunes 10:00 90' · 'borra sábado 16:00'"/>
-    <button id="chatSend">Enviar</button>
-  </div>
+  <div id="chatHead">Chatbot <small style="font-weight:400;color:var(--muted)">conectado</small><button id="chatClose">×</button></div>
+  <div id="chatMsgs"></div>
+  <div id="chatInputWrap"><input id="chatInput" placeholder="Pregunta sobre tu horario..."/><button id="chatSend">Enviar</button></div>
 </div>
 
-<div id="toast"></div>
-
 <script>
-// ===== PWA =====
-if ('serviceWorker' in navigator) { window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js').catch(console.error)); }
-
-// ===== Util =====
-function toast(msg,ms=1500){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._to); t._to=setTimeout(()=>t.style.display='none',ms); }
-function loadJSON(k,def){ try{const x=localStorage.getItem(k); return x?JSON.parse(x):def;}catch(e){return def;} }
+/* ---------------------- STORAGE KEYS ---------------------- */
+const KEYS = {
+  student: 'flow::student.v1',
+  subjects: 'flow::subjects.v6',
+  tasks: 'flow::tasks.v2',
+  team: 'flow::team.v1',
+  week: (w)=> `flow::${w}`,
+  recurs: 'flow::recurrences.v6'
+};
+function loadJSON(k,def){ try{ const x=localStorage.getItem(k); return x?JSON.parse(x):def; }catch(e){ return def; } }
 function saveJSON(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
 
-// ===== Navegación =====
-document.querySelectorAll('nav.tabs a').forEach(a=> a.addEventListener('click', (e)=>{
-  e.preventDefault(); const id=a.dataset.page;
-  document.querySelectorAll('nav.tabs a').forEach(t=>t.classList.remove('active')); a.classList.add('active');
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active');
+/* ---------------------- NAV ---------------------- */
+const tabs = Array.from(document.querySelectorAll('nav.tabs a'));
+tabs.forEach(a=> a.addEventListener('click', (e)=>{
+  e.preventDefault();
+  const id = a.dataset.page;
+  tabs.forEach(t=>t.classList.remove('active')); a.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
   if(id==='page-summary') renderSummary();
+  if(id==='page-home') updateHomeKPIs();
 }));
 
-// ===== Datos base =====
-const KEYS={ student:'flow::student.v1', subjects:'flow::subjects.v5', tasks:'flow::tasks.v2', week:w=>`flow::${w}`};
-const DAYS=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]; const START_H=8, END_H=22;
-const SLOTS=[]; for(let h=START_H; h<=END_H; h++){ SLOTS.push(String(h).padStart(2,'0')+':00'); if(h!==END_H) SLOTS.push(String(h).padStart(2,'0')+':30'); }
-const tbody=document.getElementById('tbody'); const dayIndex=d=>DAYS.indexOf(d);
-
-// ===== Portada =====
-function loadStudent(){ const s=loadJSON(KEYS.student,{name:'',course:'',program:'',monday:''});
-  document.getElementById('stName').value=s.name||'';
-  document.getElementById('stCourse').value=s.course||'';
-  document.getElementById('stProgram').value=s.program||'';
-  document.getElementById('mondayDate').value=s.monday||'';
+/* ---------------------- STUDENT CARD ---------------------- */
+const stName=document.getElementById('stName');
+const stCourse=document.getElementById('stCourse');
+const stProgram=document.getElementById('stProgram');
+const mondayDate=document.getElementById('mondayDate');
+const saveStudentBtn=document.getElementById('saveStudentBtn');
+function loadStudent(){
+  const s = loadJSON(KEYS.student, {name:'',course:'',program:'',monday:''});
+  stName.value=s.name||''; stCourse.value=s.course||''; stProgram.value=s.program||''; mondayDate.value=s.monday||'';
 }
-document.getElementById('saveStudentBtn').addEventListener('click',()=>{
-  const s={
-    name:document.getElementById('stName').value.trim(),
-    course:document.getElementById('stCourse').value.trim(),
-    program:document.getElementById('stProgram').value.trim(),
-    monday:document.getElementById('mondayDate').value
-  }; saveJSON(KEYS.student,s); toast('Portada guardada');
-});
+function saveStudent(){ const s={name:stName.value.trim(), course:stCourse.value.trim(), program:stProgram.value.trim(), monday:mondayDate.value}; saveJSON(KEYS.student, s); alert('Portada guardada'); }
+saveStudentBtn.addEventListener('click', saveStudent);
 
-// ===== Grid =====
+/* ---------------------- SCHEDULE CORE ---------------------- */
+const DAYS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const START_H = 8, END_H = 22;
+const SLOTS = []; for(let h=START_H; h<=END_H; h++){ SLOTS.push(`${String(h).padStart(2,'0')}:00`); if(h!==END_H) SLOTS.push(`${String(h).padStart(2,'0')}:30`); }
+const dayIndex = d => DAYS.indexOf(d);
+const weekSelect = document.getElementById('weekSelect');
+let currentWeek = 'Semana 1'; for(let i=1;i<=16;i++){ const o=document.createElement('option'); o.value=`Semana ${i}`; o.textContent=`Semana ${i}`; weekSelect.appendChild(o); } weekSelect.value=currentWeek;
+const tbody=document.getElementById('tbody');
+
+function isBefore(a,b){ return a<b; }
 function isUnavailable(day,time){
-  if(["Lunes","Miércoles","Viernes"].includes(day)){ if(time<"16:30") return true; }
+  if(["Lunes","Miércoles","Viernes"].includes(day)){ if(isBefore(time,"16:30")) return true; }
   if(["Martes","Jueves"].includes(day)){ if(["14:00","14:30","15:00"].includes(time)) return true; }
   return false;
 }
@@ -230,209 +282,510 @@ function renderGrid(){
     for(const day of DAYS){
       const td=document.createElement('td'); td.dataset.day=day; td.dataset.time=time;
       td.className = isUnavailable(day,time) ? 'cell indisp' : 'cell';
-      td.addEventListener('click',()=>openEditor(td));
-      // drops
-      td.addEventListener('dragover', e=>{ e.preventDefault(); td.classList.add('drop-target'); });
-      td.addEventListener('dragleave', ()=> td.classList.remove('drop-target'));
-      td.addEventListener('drop', e=>{
-        e.preventDefault(); td.classList.remove('drop-target');
-        const subj = e.dataTransfer.getData('text/subject'); if(!subj) return;
-        const dIdx = dayIndex(td.dataset.day); const r = SLOTS.indexOf(td.dataset.time);
-        for(let i=0;i<2;i++){ const c=tbody.children[r+i]?.children[dIdx+1]; if(!c) continue; writeCell(c,'t-blue','Uni — '+subj,{type:'study',subject:subj,plannedMin:30}); }
-        saveWeek();
-      });
+      td.addEventListener('click',()=> openEditor(td));
+      td.addEventListener('dblclick',()=> editNoteInline(td));
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
   }
 }
+function editNoteInline(td){
+  const metaEl = td.querySelector('.meta'); if(!metaEl) return;
+  let meta=JSON.parse(metaEl.textContent||'{}');
+  const cur = meta.note||'';
+  const ta=document.createElement('textarea'); ta.value=cur; ta.style.width='100%'; ta.style.marginTop='6px';
+  td.appendChild(ta); ta.focus();
+  ta.addEventListener('blur',()=>{ meta.note=ta.value; metaEl.textContent=JSON.stringify(meta); ta.remove(); saveWeek(); });
+}
+function roundDownToSlot(t){ const [H,M]=t.split(':').map(n=>+n); const mm = M<30?'00':'30'; return `${String(H).padStart(2,'0')}:${mm}`; }
+function roundUpToSlot(t){ let [H,M]=t.split(':').map(n=>+n); let hh=H, mm; if(M===0)mm='00'; else if(M<=30)mm='30'; else{hh=H+1;mm='00';} return `${String(hh).padStart(2,'0')}:${mm}`; }
 
-// ===== Subjects =====
+/* Clases fijas (plan de ejemplo inicial UCONN) */
+const FIXED_CLASSES = [
+  {day:"Lunes", start:"09:05", end:"09:55", title:"STAT 1100Q - 015 Lecture", location:"Philip E. Austin Building 108"},
+  {day:"Miércoles", start:"08:00", end:"08:50", title:"STAT 1100Q - 017D Discussion", location:"Charles Lewis Beach Hall 443"},
+  {day:"Miércoles", start:"09:05", end:"09:55", title:"STAT 1100Q - 015 Lecture", location:"Philip E. Austin Building 108"},
+  {day:"Viernes", start:"09:05", end:"09:55", title:"STAT 1100Q - 015 Lecture", location:"Philip E. Austin Building 108"},
+  {day:"Lunes", start:"10:10", end:"11:00", title:"AAAS 1001 - 001 Lecture (Online)", location:"Storrs Online"},
+  {day:"Miércoles", start:"10:10", end:"11:00", title:"AAAS 1001 - 001 Lecture (Online)", location:"Storrs Online"},
+  {day:"Viernes", start:"10:10", end:"11:00", title:"AAAS 1001 - 001 Lecture (Online)", location:"Storrs Online"},
+  {day:"Lunes", start:"12:20", end:"13:10", title:"UNIV 1800 - 274 Seminar", location:"Rowe Ctr for Undergraduate Edu 131"},
+  {day:"Martes", start:"14:00", end:"15:15", title:"ENGL 1007 - 072 Seminar", location:"Benjamin Franklin Koons Hall 103"},
+  {day:"Jueves", start:"14:00", end:"15:15", title:"ENGL 1007 - 072 Seminar", location:"Benjamin Franklin Koons Hall 103"},
+  {day:"Lunes", start:"15:35", end:"16:25", title:"ECON 1201 - 020 Lecture", location:"Info Tech Engineering Building C80"},
+  {day:"Martes", start:"15:35", end:"16:25", title:"ECON 1201 - 020 Lecture", location:"Info Tech Engineering Building C80"},
+  {day:"Viernes", start:"15:35", end:"16:25", title:"ECON 1201 - 020 Lecture", location:"Info Tech Engineering Building C80"},
+];
+function fillFixedClass(day, start, end, title, location){
+  const dIdx = dayIndex(day); if(dIdx===-1) return;
+  const s = roundDownToSlot(start), e = roundUpToSlot(end);
+  let i = SLOTS.indexOf(s), endIdx = SLOTS.indexOf(e);
+  for(; i<=endIdx-1; i++){
+    const tr = tbody.children[i];
+    const td = tr.children[dIdx+1];
+    if(!td) continue;
+    td.className='locked';
+    td.innerHTML = `<span class="tag t-blue">Clase fija</span><br>${title}${location?` — ${location}`:''}<span class="meta">{ "type":"fixed","plannedMin":30,"actualMin":0,"done":false }</span>`;
+  }
+}
+function placeFixedClasses(){ FIXED_CLASSES.forEach(c=> fillFixedClass(c.day, c.start, c.end, c.title, c.location)); }
+
+/* Subjects */
 function subjects(){ return loadJSON(KEYS.subjects, []); }
 function setSubjects(list){ saveJSON(KEYS.subjects, list); renderSubjects(); renderTaskSubjects(); }
+function subjectsMap(){ const m={}; subjects().forEach(s=>m[s.name]=s); return m; }
+const subjectName=document.getElementById('subjectName');
+const subjectColor=document.getElementById('subjectColor');
+const subjectTarget=document.getElementById('subjectTarget');
+const deadlineTitle=document.getElementById('deadlineTitle');
+const deadlineDate=document.getElementById('deadlineDate');
+const addSubjectBtn=document.getElementById('addSubject');
+const addDeadlineBtn=document.getElementById('addDeadline');
+const subjectsListDiv=document.getElementById('subjectsList');
+function ensureDefaultSubjects(){
+  const cur = subjects();
+  if(cur && cur.length) return;
+  setSubjects([
+    {name:"Matemáticas", color:"#1e40af", target:3, deadlines:[]},
+    {name:"Lengua", color:"#dc2626", target:2, deadlines:[]},
+    {name:"Economía", color:"#16a34a", target:2, deadlines:[]}
+  ]);
+}
 function renderSubjects(){
-  const div=document.getElementById('subjectsList'); div.innerHTML='';
-  const list=subjects();
-  if(!list.length){ div.innerHTML='<div class="sub">(Aún no hay asignaturas)</div>'; return; }
+  const list = subjects();
+  subjectsListDiv.innerHTML='';
   list.forEach((s,idx)=>{
-    const row=document.createElement('div'); row.style.display='flex'; row.style.gap='8px'; row.style.alignItems='center';
-    row.innerHTML=`<span style="width:10px;height:10px;border-radius:999px;background:${s.color};display:inline-block"></span> <b>${s.name}</b> · Obj: ${s.target}h`;
-    row.setAttribute('draggable','true');
-    row.addEventListener('dragstart',(e)=>{ e.dataTransfer.setData('text/subject', s.name); });
-    const edit=document.createElement('button'); edit.textContent='Editar'; edit.onclick=()=>{ subjectName.value=s.name; subjectColor.value=s.color; subjectTarget.value=s.target; };
-    const del=document.createElement('button'); del.textContent='Eliminar'; del.onclick=()=>{ const arr=subjects(); arr.splice(idx,1); setSubjects(arr); };
-    div.appendChild(row); div.appendChild(edit); div.appendChild(del);
+    const row = document.createElement('div'); row.className='toolbar'; row.style.justifyContent='space-between';
+    const chip = document.createElement('div'); chip.className='sub'; chip.innerHTML = `<span style="width:10px;height:10px;border-radius:999px;background:${s.color};display:inline-block"></span> <b>${s.name}</b> · Obj: ${s.target}h`;
+    const edit = document.createElement('button'); edit.textContent='Editar'; edit.addEventListener('click',()=>{ subjectName.value=s.name; subjectColor.value=s.color; subjectTarget.value=s.target; });
+    const del = document.createElement('button'); del.textContent='Eliminar'; del.addEventListener('click',()=>{ const arr=subjects(); arr.splice(idx,1); setSubjects(arr); });
+    row.appendChild(chip); row.appendChild(edit); row.appendChild(del); subjectsListDiv.appendChild(row);
+    const deadlines = document.createElement('div'); deadlines.className='sub'; deadlines.style.opacity=.8;
+    deadlines.textContent = s.deadlines?.length? ('Entregas: '+s.deadlines.map(d=>`${d.title||'Entrega'} · ${d.date}`).join(' | ')) : 'Sin entregas';
+    subjectsListDiv.appendChild(deadlines);
   });
 }
-const subjectName=document.getElementById('subjectName'), subjectColor=document.getElementById('subjectColor'), subjectTarget=document.getElementById('subjectTarget');
-document.getElementById('addSubject').addEventListener('click',()=>{
-  const name=subjectName.value.trim(); if(!name) return;
+addSubjectBtn.addEventListener('click',()=>{
+  const name=subjectName.value.trim(); if(!name) return alert('Nombre de asignatura');
   const col=subjectColor.value; const tgt=parseFloat(subjectTarget.value||'0')||0;
   const arr=subjects(); const i=arr.findIndex(x=>x.name===name);
-  if(i>=0){ arr[i].color=col; arr[i].target=tgt; } else { arr.push({name, color:col, target:tgt}); }
+  if(i>=0){ arr[i].color=col; arr[i].target=tgt; } else { arr.push({name, color:col, target:tgt, deadlines:[]}); }
   setSubjects(arr); subjectName.value=''; subjectTarget.value='2';
 });
-function renderTaskSubjects(){ const sel=document.getElementById('taskSubject'); sel.innerHTML=''; (subjects()||[]).forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; sel.appendChild(o); }); }
+addDeadlineBtn.addEventListener('click',()=>{
+  const name=subjectName.value.trim(); const date=deadlineDate.value; if(!name || !date) return alert('Selecciona asignatura y fecha');
+  const arr=subjects(); const i=arr.findIndex(x=>x.name===name); if(i<0) return alert('Primero guarda la asignatura');
+  const title=deadlineTitle.value.trim()||'Entrega'; arr[i].deadlines = arr[i].deadlines || []; arr[i].deadlines.push({title, date});
+  setSubjects(arr); deadlineTitle.value=''; deadlineDate.value='';
+});
 
-// ===== Helpers
-function writeCell(td, cls, text, meta){ td.className='cell'; td.innerHTML=''; const tag=document.createElement('span'); tag.className='tag '+cls; tag.textContent=text; td.appendChild(tag); const m=document.createElement('span'); m.className='meta'; m.textContent=JSON.stringify(meta); td.appendChild(m); }
-function metaOf(td){ const m=td.querySelector('.meta'); if(!m) return null; try{return JSON.parse(m.textContent||'{}');}catch(_){return null;} }
-function dayTokToName(tok){ tok=tok.toLowerCase(); if(tok.startsWith('lu'))return 'Lunes'; if(tok.startsWith('ma') && tok!='may')return 'Martes'; if(tok.startsWith('mi'))return 'Miércoles'; if(tok.startsWith('ju'))return 'Jueves'; if(tok.startsWith('vi'))return 'Viernes'; if(tok.startsWith('sa'))return 'Sábado'; if(tok.startsWith('do'))return 'Domingo'; return null; }
-function parseTime(t){ const m=t.match(/^(\d{1,2})(?:[:h](\d{2}))?$/); if(!m) return null; let H=parseInt(m[1],10), M=m[2]?parseInt(m[2],10):0; if(H<0||H>23) return null; if(M!==0 && M!==30) M=0; return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'); }
-function teacherAllowed(day){ if(['Martes','Jueves'].includes(day)) return ['18:00','19:00','20:00']; if(['Sábado','Domingo'].includes(day)) return ['16:00','17:00','18:00']; return []; }
-async function addTeacherBlock(teacher, day, requested){
-  const allowed=teacherAllowed(day); if(!allowed.length){ toast('Solo Ma/Ju 18–20 o Sa/Do 16–18'); return false; }
-  const want=SLOTS.indexOf(requested||allowed[0]);
-  const chosen = requested && allowed.includes(requested) ? requested : (allowed.find(h=>SLOTS.indexOf(h)>=want) || allowed[0]);
-  const startIdx=SLOTS.indexOf(chosen); const dIdx=DAYS.indexOf(day);
-  for(let i=0;i<2;i++){ const td=tbody.children[startIdx+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,(teacher==='Nuria')?'t-yellow':'t-orange', `${teacher} — ${chosen}`, {type:'teacher',teacher,plannedMin:30}); }
-  saveWeek(); return true;
+/* Tasks + Team */
+function team(){ return loadJSON(KEYS.team, []); }
+function setTeam(x){ saveJSON(KEYS.team, x); renderTeam(); renderTeamSelect(); renderTeamStats(); }
+function renderTeam(){
+  const list=team(); const box=document.getElementById('teamList'); box.innerHTML='';
+  if(!list.length){ box.textContent='No hay miembros añadidos.'; return; }
+  list.forEach((n,i)=>{
+    const row=document.createElement('div'); row.className='toolbar'; row.innerHTML=`• ${n}`;
+    const del=document.createElement('button'); del.textContent='Eliminar'; del.addEventListener('click',()=>{ const l=team(); l.splice(i,1); setTeam(l); });
+    row.appendChild(del); box.appendChild(row);
+  });
+}
+function renderTeamSelect(){ const sel=document.getElementById('taskAssignee'); sel.innerHTML=''; const ph=document.createElement('option'); ph.value=''; ph.textContent='— responsable —'; sel.appendChild(ph); team().forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); }); }
+document.getElementById('addAssigneeBtn').addEventListener('click',()=>{ const inp=document.getElementById('assigneeInput'); const name=inp.value.trim(); if(!name) return; const l=team(); if(!l.includes(name)) l.push(name); setTeam(l); inp.value=''; });
+function loadTasks(){ return loadJSON(KEYS.tasks, {}); }
+function saveTasks(t){ saveJSON(KEYS.tasks, t); renderTasks(); renderTeamStats(); updateHomeKPIs(); }
+const taskSubject=document.getElementById('taskSubject'), taskTitle=document.getElementById('taskTitle'), taskDue=document.getElementById('taskDue'), taskEst=document.getElementById('taskEst'), addTaskBtn=document.getElementById('addTaskBtn'), taskAssignee=document.getElementById('taskAssignee');
+function renderTaskSubjects(){ const sel=taskSubject; sel.innerHTML=''; subjects().forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; sel.appendChild(o); }); }
+addTaskBtn.addEventListener('click',()=>{
+  if(!taskTitle.value.trim()) return;
+  const subj=taskSubject.value, title=taskTitle.value.trim(), due=taskDue.value||null, est=parseFloat(taskEst.value||'0')||0, who=taskAssignee.value||null;
+  const t=loadTasks(); t[subj]=t[subj]||[]; t[subj].push({id: Date.now()+Math.random().toString(16).slice(2), subject:subj, title, due, est, done:false, who});
+  saveTasks(t); taskTitle.value=''; taskDue.value=''; taskEst.value='1'; taskAssignee.value='';
+});
+function toggleTaskDone(subj,id,done){ const t=loadTasks(); const arr=t[subj]||[]; const it=arr.find(x=>x.id===id); if(it){ it.done=done; saveTasks(t); } }
+function renderTasks(){
+  const t=loadTasks(); const wrap=document.getElementById('tasksList'); wrap.innerHTML='';
+  Object.keys(t).forEach(subj=>{
+    const title=document.createElement('h4'); title.textContent=subj; wrap.appendChild(title);
+    (t[subj]||[]).forEach(item=>{
+      const card=document.createElement('div'); card.className='toolbar'; card.style.justifyContent='space-between'; card.style.border='1px solid var(--border)'; card.style.borderRadius='10px';
+      const left=document.createElement('div'); left.className='toolbar';
+      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=item.done; cb.addEventListener('change',()=>toggleTaskDone(subj,item.id,cb.checked));
+      left.appendChild(cb);
+      const span=document.createElement('span'); span.textContent = `${item.title}` + (item.due?` · ${item.due}`:'') + (item.est?` · ${item.est}h`:'') + (item.who?` · ${item.who}`:'');
+      left.appendChild(span);
+      const del=document.createElement('button'); del.textContent='Eliminar'; del.addEventListener('click',()=>{ const tt=loadTasks(); tt[subj]=tt[subj].filter(x=>x.id!==item.id); saveTasks(tt); });
+      card.appendChild(left); card.appendChild(del); wrap.appendChild(card);
+    });
+  });
 }
 
-// ===== Editor (no re-abrir en misma celda consecutiva)
-let lastOpenedCell=null;
-function openEditor(cell){
-  if(cell===lastOpenedCell){ lastOpenedCell=null; return; }
-  lastOpenedCell=cell;
-  const day=cell.dataset.day, clickedTime=cell.dataset.time;
-  const ed=document.createElement('div'); ed.style.position='absolute'; ed.style.zIndex='10'; ed.style.background='var(--panel)'; ed.style.border='1px solid var(--border)'; ed.style.borderRadius='10px'; ed.style.padding='10px'; ed.style.boxShadow='0 8px 24px rgba(2,6,23,.12)';
-  const rect=cell.getBoundingClientRect(); ed.style.left=(window.scrollX+rect.left+6)+'px'; ed.style.top=(window.scrollY+rect.top+6)+'px';
-  const typeSel=document.createElement('select'); ['(tipo)','Clase — Profesor/a','Universidad — Repaso','Descanso'].forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; typeSel.appendChild(o); });
-  const durSel=document.createElement('select'); ['30','60','90','120'].forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m+' min'; durSel.appendChild(o);}); durSel.value='60';
+/* Helpers */
+const overlayMsgEl = null;
+function writeCell(td, cls, text, meta){
+  td.className='cell'; td.innerHTML='';
+  const span=document.createElement('span'); span.className='tag '+cls; span.textContent=text; td.appendChild(span);
+  if(meta.note && meta.type!=='rest'){ td.appendChild(document.createElement('br')); td.appendChild(document.createTextNode(meta.note)); }
+  td.insertAdjacentHTML('beforeend', `<span class="meta">${JSON.stringify(meta)}</span>`);
+}
+function metaOf(td){ const m=td.querySelector('.meta'); if(!m) return null; try{ return JSON.parse(m.textContent||'{}'); }catch(_){ return null; } }
+function hasConflict(day, startIdx, slots){ const dIdx=dayIndex(day); for(let i=0;i<slots;i++){ const r=startIdx+i; const td=tbody.children[r]?.children[dIdx+1]; if(!td||td.classList.contains('locked')) return true; if(metaOf(td)) return true; } return false; }
+function normalizeDuration(min){ const chk=document.getElementById('snapChk'); if(!chk || !chk.checked) return min; if(min<=60) return 60; if(min<=90) return 90; if(min<=120) return 120; return Math.ceil(min/30)*30; }
+
+/* Editor de creación */
+
+function openEditor(td){
+  if(td.classList.contains('locked')) return;
+  const day=td.dataset.day, clickedTime=td.dataset.time;
+  const existing = metaOf(td);
+  if(existing){ return; }
+
+  const ed=document.createElement('div');
+  ed.style.position='absolute'; ed.style.zIndex='10'; ed.style.background='var(--panel)'; ed.style.border='1px solid var(--border)'; ed.style.borderRadius='10px'; ed.style.padding='10px'; ed.style.boxShadow='0 8px 24px rgba(2,6,23,.12)';
+  const rect=td.getBoundingClientRect(); ed.style.left=(window.scrollX+rect.left+6)+'px'; ed.style.top=(window.scrollY+rect.top+6)+'px';
+
+  const typeSel=document.createElement('select');
+  ['(tipo)','Clase — Profesor/a','Lengua — Paper/Simulacro','Universidad — Repaso','IB — Examen P1','IB — Examen P2','Descanso'].forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; typeSel.appendChild(o); });
+
+  const quickSel=document.createElement('select'); quickSel.style.marginLeft='6px';
+  ['(bloque rápido)','Repaso post-clase (60m)','Resolución de problemas (90m)','Lectura (60m)','Simulacro 60m','Simulacro 120m'].forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; quickSel.appendChild(o); });
+
+  const durSel=document.createElement('select'); durSel.style.marginLeft='6px'; ['30','60','90','120','150','180'].forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m+' min'; durSel.appendChild(o); }); durSel.value='60';
+
   const profSel=document.createElement('select'); ['','Nuria','Juan Carlos'].forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n||'— profesor/a —'; profSel.appendChild(o); });
-  const hourSel=document.createElement('select'); const allowed = teacherAllowed(day); if(!allowed.length){ hourSel.disabled=true; } else { const ph=document.createElement('option'); ph.value=''; ph.textContent='— hora —'; hourSel.appendChild(ph); allowed.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; hourSel.appendChild(o); }); }
-  const subjSel=document.createElement('select'); const ph=document.createElement('option'); ph.value=''; ph.textContent='— asignatura —'; subjSel.appendChild(ph);
-  (subjects()||[]).forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; subjSel.appendChild(o); });
-  const ok=document.createElement('button'); ok.textContent='Aplicar'; const cancel=document.createElement('button'); cancel.textContent='Cancelar'; cancel.style.marginLeft='6px';
-  ok.addEventListener('click',async()=>{
-    const type=typeSel.value;
-    if(type==='Clase — Profesor/a'){
-      if(!profSel.value) return toast('Elige profesor/a');
-      const chosen = hourSel.disabled || !hourSel.value ? (teacherAllowed(day)[0]||null) : hourSel.value;
-      if(!chosen) return toast('Solo Ma/Ju 18–20 o Sa/Do 16–18');
-      await addTeacherBlock(profSel.value, day, chosen);
-    }else if(type==='Universidad — Repaso'){
-      const dur=parseInt(durSel.value,10); const slots=Math.ceil(dur/30); const dIdx=DAYS.indexOf(day); const start=SLOTS.indexOf(clickedTime);
-      for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,'t-blue', subjSel.value?('Uni — '+subjSel.value):'Universidad — Repaso',{type:'study',subject:subjSel.value||null,plannedMin:30}); }
-      saveWeek();
-    }else if(type==='Descanso'){
-      const dur=parseInt(durSel.value,10); const slots=Math.ceil(dur/30); const dIdx=DAYS.indexOf(day); const start=SLOTS.indexOf(clickedTime);
-      for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,'t-green','Descanso',{type:'rest',plannedMin:30}); }
-      saveWeek();
-    }else return toast('Selecciona un tipo');
-    document.body.removeChild(ed); lastOpenedCell=null;
+  const hourSel=document.createElement('select'); const allowed=[]; if(['Martes','Jueves'].includes(day)) allowed.push('18:00','19:00','20:00'); if(['Sábado','Domingo'].includes(day)) allowed.push('16:00','17:00','18:00');
+  if(!allowed.length){ hourSel.disabled=true; } else { const ph=document.createElement('option'); ph.value=''; ph.textContent='— hora —'; hourSel.appendChild(ph); allowed.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; hourSel.appendChild(o); }); }
+
+  const subjSel=document.createElement('select'); const ph=document.createElement('option'); ph.value=''; ph.textContent='— asignatura —'; subjSel.appendChild(ph); subjects().forEach(s=>{ const o=document.createElement('option'); o.value=s.name; o.textContent=s.name; subjSel.appendChild(o); });
+
+  const note=document.createElement('input'); note.placeholder='Detalle (tema, capítulos, etc.)';
+
+  const repWrap=document.createElement('div'); repWrap.className='sub';
+  repWrap.innerHTML = 'Repetir en: '+DAYS.map(d=>`<label><input type="checkbox" class="repday" value="${d}"> ${d.slice(0,2)}</label>`).join(' ')+' · <label><input id="repAllWeeks" type="checkbox" checked> todas las semanas</label>';
+
+  const ok=document.createElement('button'); ok.textContent='Aplicar';
+  const cancel=document.createElement('button'); cancel.textContent='Cancelar'; cancel.style.marginLeft='6px';
+
+  quickSel.addEventListener('change',()=>{
+    const v=quickSel.value;
+    if(v.includes('post-clase')){ typeSel.value='Universidad — Repaso'; durSel.value='60'; note.value='Repaso post‑clase'; }
+    else if(v.includes('Resolución')){ typeSel.value='Universidad — Repaso'; durSel.value='90'; note.value='Resolución de problemas'; }
+    else if(v.includes('Lectura')){ typeSel.value='Universidad — Repaso'; durSel.value='60'; note.value='Lectura activa'; }
+    else if(v.includes('Simulacro 60')){ typeSel.value='Lengua — Paper/Simulacro'; durSel.value='60'; note.value='Simulacro 60’'; }
+    else if(v.includes('Simulacro 120')){ typeSel.value='Lengua — Paper/Simulacro'; durSel.value='120'; note.value='Simulacro 120’'; }
   });
-  cancel.addEventListener('click',()=>{ document.body.removeChild(ed); lastOpenedCell=null; });
-  ed.appendChild(typeSel); ed.appendChild(durSel); ed.appendChild(document.createElement('br')); ed.appendChild(profSel); ed.appendChild(hourSel); ed.appendChild(document.createElement('br')); ed.appendChild(subjSel); ed.appendChild(document.createElement('br')); ed.appendChild(ok); ed.appendChild(cancel);
+
+  ok.addEventListener('click',()=>{
+    const type=typeSel.value;
+    let dur=parseInt(durSel.value,10); dur = normalizeDuration(dur);
+    const dIdx = dayIndex(day);
+    const apply=(startIdx, slots, writer)=>{
+      for(let i=0;i<slots;i++){
+        const r=startIdx+i; const td2=tbody.children[r].children[dIdx+1]; if(!td2||td2.classList.contains('locked')) continue; writer(td2,r);
+      }
+    };
+
+    if(type==='Clase — Profesor/a'){
+      if(!profSel.value) return alert('Elige profesor/a'); if(hourSel.disabled || !hourSel.value) return alert('Elige una hora válida');
+      const startIdx=SLOTS.indexOf(hourSel.value); apply(startIdx,2,(td2)=> writeCell(td2,(profSel.value==='Nuria')?'t-yellow':'t-orange', `${profSel.value} — ${hourSel.value}`, {type:'teacher',teacher:profSel.value,plannedMin:30,actualMin:0,done:false,note:note.value||''}));
+    }else{
+      const startIdx=SLOTS.indexOf(clickedTime); const slots=Math.ceil(dur/30);
+      apply(startIdx,slots,(td2)=>{
+        if(type==='Lengua — Paper/Simulacro'){ writeCell(td2,'t-red','Lengua — Paper/Simulacro',{type:'lengua',plannedMin:30,actualMin:0,done:false,note:note.value||''}); }
+        else if(type==='Universidad — Repaso'){ const subj=subjSel.value||null; const m={type:'study',subject:subj,plannedMin:30,actualMin:0,done:false,note:note.value||''}; writeCell(td2,'t-blue', subj?`Uni — ${subj}`:'Universidad — Repaso', m); if(subj){ const col=subjectsMap()[subj]?.color; if(col){ td2.querySelector('.tag').style.background=col; } } }
+        else if(type==='IB — Examen P1' || type==='IB — Examen P2'){ writeCell(td2,'t-pink',type,{type:'ib',plannedMin:30,actualMin:0,done:false,note:note.value||''}); }
+        else if(type==='Descanso'){ writeCell(td2,'t-green','Descanso',{type:'rest',plannedMin:30,actualMin:0,done:false,note:''}); }
+        else return alert('Selecciona un tipo de bloque');
+      });
+    }
+
+    // Recurrencia
+    const checks = ed.querySelectorAll('.repday:checked'); const repAll = ed.querySelector('#repAllWeeks').checked; const weekNum = parseInt(currentWeek.split(' ')[1]);
+    const baseTime = (type==='Clase — Profesor/a' ? hourSel.value : clickedTime);
+    const duration = (type==='Clase — Profesor/a' ? 60 : dur);
+    const baseRec = {day, time: baseTime, duration, type, subject: subjSel.value||null, note: note.value||'', teacher: (type==='Clase — Profesor/a'? profSel.value:null), weeks: repAll?'all':[weekNum]};
+    const recs = loadJSON(KEYS.recurs, []);
+    if(checks.length===0){ recs.push(baseRec); } checks.forEach(ch=> recs.push({...baseRec, day: ch.value}));
+    saveJSON(KEYS.recurs, recs);
+
+    saveWeek(); document.body.removeChild(ed);
+  });
+
+  cancel.addEventListener('click',()=> document.body.removeChild(ed));
+
+  ed.appendChild(typeSel); ed.appendChild(quickSel); ed.appendChild(durSel);
+  ed.appendChild(document.createElement('br')); ed.appendChild(profSel); ed.appendChild(hourSel);
+  ed.appendChild(document.createElement('br')); ed.appendChild(subjSel);
+  ed.appendChild(note);
+  ed.appendChild(document.createElement('br')); ed.appendChild(repWrap);
+  ed.appendChild(document.createElement('br')); ed.appendChild(ok); ed.appendChild(cancel);
   document.body.appendChild(ed);
 }
 
-// ===== Semana / persistencia =====
-const weekSelect=document.getElementById('weekSelect'); let currentWeek='Semana 1'; for(let i=1;i<=16;i++){ const o=document.createElement('option'); o.value=`Semana ${i}`; o.textContent=`Semana ${i}`; weekSelect.appendChild(o);} weekSelect.value=currentWeek;
+
+/* SAVE/LOAD + RECURRENCES */
 function key(){ return KEYS.week(currentWeek); }
 function saveWeek(){
-  const data=[]; tbody.querySelectorAll('tr').forEach((tr,rowIdx)=>{
-    const row={time:SLOTS[rowIdx]}; DAYS.forEach((day,i)=>{ const td=tr.children[i+1]; row[day]={html:td.innerHTML,cls:td.className}; }); data.push(row);
-  }); saveJSON(key(),data); renderSummary();
+  const data=[];
+  tbody.querySelectorAll('tr').forEach((tr,rowIdx)=>{
+    const row = {time: SLOTS[rowIdx]};
+    DAYS.forEach((day,i)=>{
+      const td = tr.children[i+1];
+      row[day] = {html: td.innerHTML, cls: td.className};
+    });
+    data.push(row);
+  });
+  saveJSON(key(), data); updateHomeKPIs();
+}
+function applyRecurrences(erase=false){
+  const recs = loadJSON(KEYS.recurs, []);
+  const wnum = parseInt(currentWeek.split(' ')[1]);
+  (recs||[]).forEach(r=>{
+    if(r.weeks!=='all' && !(r.weeks||[]).includes(wnum)) return;
+    const dIdx = dayIndex(r.day); if(dIdx<0) return;
+    const startIdx = SLOTS.indexOf(r.time); const endIdx = startIdx + Math.ceil((r.duration||60)/30);
+    for(let i=startIdx;i<endIdx;i++){
+      const td = tbody.children[i].children[dIdx+1];
+      if(!td || td.classList.contains('locked')) continue;
+      if(!erase && metaOf(td)) continue;
+      let cls='t-blue', text=''; let meta={type:'study', subject:r.subject, plannedMin:30, actualMin:0, done:false, note:r.note||''};
+      if(r.type==='Clase — Profesor/a'){ cls=(r.teacher==='Nuria')?'t-yellow':'t-orange'; text=`${r.teacher} — ${r.time}`; meta.type='teacher'; meta.teacher=r.teacher; }
+      else if(r.type==='Estudio — Asignatura'){ cls='t-blue'; text= r.subject? `Estudio — ${r.subject}` : 'Estudio'; }
+      else if(r.type==='Lengua — Paper/Simulacro'){ cls='t-red'; text='Lengua — Paper/Simulacro'; meta.type='lengua'; }
+      else if(r.type==='IB — Examen P1' || r.type==='IB — Examen P2'){ cls='t-pink'; text=r.type; meta.type='ib'; }
+      else if(r.type==='Descanso'){ cls='t-green'; text='Descanso'; meta.type='rest'; }
+      writeCell(td, cls, text, meta);
+      if(r.type==='Estudio — Asignatura' && r.subject){ const col=subjectsMap()[r.subject]?.color; if(col){ td.querySelector('.tag').style.background=col; } }
+    }
+  });
 }
 function loadWeek(){
-  renderGrid();
-  const raw=loadJSON(key(),null);
-  if(raw){ raw.forEach((row,rIdx)=>{ const tr=tbody.children[rIdx]; DAYS.forEach((day,i)=>{ const td=tr.children[i+1]; if(!td) return; td.innerHTML=row[day].html; td.className=row[day].cls||'cell'; }); }); }
+  renderGrid(); placeFixedClasses();
+  const raw = loadJSON(key(), null);
+  if(raw){
+    raw.forEach((row,rIdx)=>{
+      const tr = tbody.children[rIdx];
+      DAYS.forEach((day,i)=>{
+        const td = tr.children[i+1];
+        if(!td || td.classList.contains('locked')) return;
+        td.innerHTML = row[day].html;
+        td.className = row[day].cls || 'cell';
+      });
+    });
+  }
+  applyRecurrences(false); updateHomeKPIs();
 }
-document.getElementById('saveBtn').addEventListener('click',()=>{ saveWeek(); toast('Semana guardada ✔'); });
-document.getElementById('clearBtn').addEventListener('click',()=>{ renderGrid(); saveWeek(); });
-weekSelect.addEventListener('change',()=>{ currentWeek=weekSelect.value; loadWeek(); });
 
-// ===== Export CSV & ICS =====
+/* EXPORT CSV */
 document.getElementById('exportBtn').addEventListener('click',()=>{
   const rows=[["Hora",...DAYS]];
   tbody.querySelectorAll('tr').forEach((tr,rowIdx)=>{
     const line=[SLOTS[rowIdx]];
     DAYS.forEach((day,i)=>{
-      const td=tr.children[i+1];
-      const txt=td.querySelector('.tag')?.textContent || '';
-      const note=td.querySelector('.meta')?.textContent || '';
+      const td = tr.children[i+1];
+      const txt = td.querySelector('.tag')?.textContent || '';
+      const note = (metaOf(td)?.note)||'';
       line.push('"' + (txt + (note? ' — '+note:'' )).replaceAll('"','""') + '"');
     });
     rows.push(line);
   });
-  const csv=rows.map(r=>r.join(',')).join('\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download=`${currentWeek.replace(' ','_')}_horario.csv`; a.click();
+  const csv=rows.map(r=>r.join(',')).join('\\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${currentWeek.replace(' ','_')}_horario.csv`; a.click();
 });
 
+/* EXPORT ICS */
 document.getElementById('exportICSBtn').addEventListener('click',()=>{
-  const s=loadJSON(KEYS.student,{}); if(!s.monday) return toast('Define "Inicio de semana (Lunes)" en la portada');
-  const startDate=new Date(s.monday+'T00:00:00'); function dayOffset(d){ return new Date(startDate.getTime() + (DAYS.indexOf(d))*86400000); }
+  const s = loadJSON(KEYS.student, {});
+  if(!s.monday) return alert('Define "Inicio de semana (Lunes)" en la portada para exportar calendario.');
+  const startDate = new Date(s.monday+'T00:00:00');
+  function dayOffset(d){ return new Date(startDate.getTime() + (DAYS.indexOf(d))*86400000); }
   function fmt(dt){ const y=dt.getFullYear(); const m=String(dt.getMonth()+1).padStart(2,'0'); const d=String(dt.getDate()).padStart(2,'0'); const H=String(dt.getHours()).padStart(2,'0'); const M=String(dt.getMinutes()).padStart(2,'0'); return `${y}${m}${d}T${H}${M}00`; }
-  // Merge contiguous equal blocks
-  let ics='BEGIN:VCALENDAR\\nVERSION:2.0\\nCALSCALE:GREGORIAN\\nMETHOD:PUBLISH\\nPRODID:-//Academia Flow//Plan//ES\\n';
-  const uidBase=Date.now();
-  DAYS.forEach((day,di)=>{
-    for(let r=0;r<SLOTS.length;r++){
-      const td=tbody.children[r]?.children[di+1]; if(!td) continue;
-      const metaEl=td.querySelector('.meta'); const tag=td.querySelector('.tag'); if(!metaEl||!tag) continue;
-      const meta=JSON.parse(metaEl.textContent||'{}'); const title=tag.textContent;
-      let end=r+1;
-      while(end<SLOTS.length){
-        const td2=tbody.children[end]?.children[di+1]; const m2=td2?.querySelector('.meta'); const t2=td2?.querySelector('.tag');
-        if(!m2||!t2) break;
-        if(m2.textContent!==metaEl.textContent || t2.textContent!==tag.textContent) break;
-        end++;
-      }
-      const startTime=SLOTS[r]; const slots=end-r; const dur=slots*30;
-      const dayDate=dayOffset(day); const [h,m]=startTime.split(':').map(x=>+x); const st=new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), h, m); const en=new Date(st.getTime()+dur*60000);
-      const uid=`af-${uidBase}-${di}-${r}`;
-      ics+=`BEGIN:VEVENT\\nUID:${uid}\\nSUMMARY:${title}\\nDTSTAMP:${fmt(new Date())}\\nDTSTART:${fmt(st)}\\nDTEND:${fmt(en)}\\nDESCRIPTION:${(meta.note||'')}\\nEND:VEVENT\\n`;
-      r=end-1;
-    }
+  let ics = 'BEGIN:VCALENDAR\\nVERSION:2.0\\nCALSCALE:GREGORIAN\\nPRODID:-//Academia Flow//Plan v6//ES\\n';
+  tbody.querySelectorAll('tr').forEach((tr,rowIdx)=>{
+    DAYS.forEach((day,i)=>{
+      const td=tr.children[i+1]; const tag=td.querySelector('.tag'); if(!tag) return;
+      const title=tag.textContent;
+      const meta = metaOf(td) || {}; const startTime=SLOTS[rowIdx];
+      const duration = (meta.type==='teacher'?60:30);
+      const dayDate = dayOffset(day);
+      const [h,m]=startTime.split(':').map(x=>+x);
+      const st=new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), h, m);
+      const en=new Date(st.getTime()+duration*60000);
+      ics += `BEGIN:VEVENT\\nSUMMARY:${title}\\nDTSTART:${fmt(st)}\\nDTEND:${fmt(en)}\\nDESCRIPTION:${(meta.note||'')}\\nEND:VEVENT\\n`;
+    });
   });
-  ics+='END:VCALENDAR';
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download='plan_estudio.ics'; a.click();
+  const t=loadJSON(KEYS.tasks, {}); Object.keys(t).forEach(subj=> (t[subj]||[]).forEach(item=>{
+    if(!item.due) return;
+    const dt = new Date(item.due+'T09:00:00');
+    ics += `BEGIN:VEVENT\\nSUMMARY:[Entrega] ${subj}: ${item.title}\\nDTSTART:${fmt(dt)}\\nDTEND:${fmt(new Date(dt.getTime()+3600000))}\\nDESCRIPTION:Estimado ${item.est||0}h${item.who? ' — Responsable: '+item.who:''}\\nEND:VEVENT\\n`;
+  }));
+  ics += 'END:VCALENDAR';
+  const blob=new Blob([ics],{type:'text/calendar'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='plan_estudio.ics'; a.click();
 });
 
-// ===== Chatbot =====
-const chatBtn=document.getElementById('chatBtn'); const chatPanel=document.getElementById('chatPanel'); const chatMessages=document.getElementById('chatMessages'); const chatInput=document.getElementById('chatInput'); const chatSend=document.getElementById('chatSend'); const quickBar=document.getElementById('chatQuick');
-chatBtn.addEventListener('click',()=>{ chatPanel.style.display = (chatPanel.style.display==='flex')?'none':'flex'; if(chatPanel.style.display!=='flex'){ chatPanel.style.display='flex'; chatPanel.style.flexDirection='column'; } });
-function pushMsg(who, text){ const row=document.createElement('div'); row.className='msg '+(who==='you'?'you':'bot'); const b=document.createElement('div'); b.className='bubble'; b.textContent=text; row.appendChild(b); chatMessages.appendChild(row); chatMessages.scrollTop=chatMessages.scrollHeight; }
-function replyBot(text){
-  const tok=text.toLowerCase().trim();
-  if(/ayuda|help|comandos/.test(tok)){ pushMsg('bot',"Comandos: 'Nuria martes 18:00', 'Juan Carlos domingo 16:00', 'repaso matematicas lunes 10:00 90', 'borra sábado 16:00', 'exporta ics', 'exporta csv'."); return; }
-  if(/exporta\\s+ics/.test(tok)){ document.getElementById('exportICSBtn').click(); pushMsg('bot','He generado el ICS.'); return; }
-  if(/exporta\\s+csv/.test(tok)){ document.getElementById('exportBtn').click(); pushMsg('bot','He generado el CSV.'); return; }
-  // profesor
-  let m = tok.match(/(nuria|juan\\s*car\\w*)\\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\\s+(\\d{1,2}[:h]\\d{2}|\\d{1,2})/i);
-  const dayTokToName=(x)=>{ x=x.toLowerCase(); if(x.startsWith('lu'))return 'Lunes'; if(x.startswith('ma') and x!='may')return 'Martes'; return {'mi':'Miércoles','ju':'Jueves','vi':'Viernes','sa':'Sábado','do':'Domingo'}[x.slice(0,2)]||null; };
-  const parseTime=(t)=>{ const mm=t.match(/^(\\d{1,2})(?:[:h](\\d{2}))?$/); if(!mm) return null; let H=parseInt(mm[1],10), M=mm[2]?parseInt(mm[2],10):0; if(H<0||H>23) return null; if(M!=0 && M!=30) M=0; return String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'); };
-  if(m){
-    const teacher = /nuria/i.test(m[1]) ? 'Nuria' : 'Juan Carlos'; const day = dayTokToName(m[2]); const hour=parseTime(m[3]);
-    if(!day||!hour) return pushMsg('bot','No entiendo el día/hora.'); addTeacherBlock(teacher, day, hour).then(ok=> pushMsg('bot', ok?'He programado la clase.':'No se pudo colocar.')); return;
-  }
-  // repaso
-  m = tok.match(/(repaso|estudio)\\s+([\\wáéíóúñ]+)\\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\\s+(\\d{1,2}[:h]\\d{2}|\\d{1,2})\\s+(\\d{2,3})/i);
-  if(m){
-    const subj=m[2]; const day=dayTokToName(m[3]); const hour=parseTime(m[4]); const dur=parseInt(m[5],10); if(!day||!hour) return pushMsg('bot','No entiendo el día/hora.');
-    const dIdx=DAYS.indexOf(day); const start=SLOTS.indexOf(hour); const slots=Math.ceil(dur/30);
-    for(let i=0;i<slots;i++){ const td=tbody.children[start+i]?.children[dIdx+1]; if(!td) continue; writeCell(td,'t-blue','Uni — '+subj,{type:'study',subject:subj,plannedMin:30}); }
-    saveWeek(); pushMsg('bot','He creado el bloque de estudio.'); return;
-  }
-  // borrar
-  m = tok.match(/borra\\s+(lunes|martes|mi[eé]rcoles|jueves|viernes|s[áa]bado|domingo)\\s+(\\d{1,2}[:h]\\d{2}|\\d{1,2})/i);
-  if(m){
-    const day=dayTokToName(m[1]); const hour=parseTime(m[2]); const dIdx=DAYS.indexOf(day); const r=SLOTS.indexOf(hour); const td=tbody.children[r]?.children[dIdx+1];
-    if(td){ td.className='cell'; td.innerHTML=''; saveWeek(); pushMsg('bot','He borrado ese bloque.'); } else pushMsg('bot','No encontré la celda.');
-    return;
-  }
-  pushMsg('bot','No entendí. Escribe "Ayuda" para ver comandos.');
-}
-document.getElementById('chatBtn').addEventListener('click',()=>{ if(!document.getElementById('chatPanel')._inited){ ['Ayuda','Nuria martes 18:00','Juan Carlos domingo 16:00','repaso matematicas lunes 10:00 90','exporta ics','exporta csv'].forEach(q=>{ const b=document.createElement('button'); b.textContent=q; b.addEventListener('click',()=>{ const i=document.getElementById('chatInput'); i.value=q; document.getElementById('chatSend').click(); }); document.getElementById('chatQuick').appendChild(b); }); document.getElementById('chatPanel')._inited=true; } });
-document.getElementById('chatSend').addEventListener('click',()=>{ const v=document.getElementById('chatInput').value.trim(); if(!v) return; const chatMessages=document.getElementById('chatMessages'); const row=document.createElement('div'); row.className='msg you'; const b=document.createElement('div'); b.className='bubble'; b.textContent=v; row.appendChild(b); chatMessages.appendChild(row); chatMessages.scrollTop=chatMessages.scrollHeight; document.getElementById('chatInput').value=''; replyBot(v); });
+/* WEEK BUTTONS */
+const saveBtn=document.getElementById('saveBtn'), clearBtn=document.getElementById('clearBtn'), forceRecBtn=document.getElementById('forceRecBtn');
+saveBtn.addEventListener('click',()=>{ saveWeek(); alert('Semana guardada ✔'); });
+clearBtn.addEventListener('click',()=>{ if(confirm('¿Vaciar todos los bloques (mantiene clases fijas)?')){ renderGrid(); placeFixedClasses(); saveWeek(); }});
+forceRecBtn.addEventListener('click',()=>{ if(confirm('Reaplicar recurrencias: puede sobrescribir bloques existentes.')){ applyRecurrences(true); saveWeek(); alert('Recurrencias reaplicadas'); } });
+weekSelect.addEventListener('change',()=>{ currentWeek=weekSelect.value; loadWeek(); });
+document.getElementById('zoomRange').addEventListener('input',(e)=>{ const z=parseFloat(e.target.value||'1'); document.getElementById('gridWrap').style.transform=`scale(${z})`; localStorage.setItem('flow::zoom', z); });
+const z0=parseFloat(localStorage.getItem('flow::zoom')||'1'); document.getElementById('zoomRange').value=z0; document.getElementById('gridWrap').style.transform=`scale(${z0})`;
 
-// ===== Init =====
-function computeStats(){ const res={planned:0, actual:0, tasks:{done:0,total:0}}; const t=loadJSON(KEYS.tasks, {}); Object.values(t).forEach(arr=>arr.forEach(it=>{res.tasks.total++; if(it.done) res.tasks.done++;})); for(let r=0;r<SLOTS.length;r++){ for(let d=0;d<DAYS.length;d++){ const td=tbody.children[r]?.children[d+1]; if(!td) continue; const m=td.querySelector('.meta'); if(!m) continue; try{ const mm=JSON.parse(m.textContent||'{}'); res.planned += mm.plannedMin||30; }catch(_){} } } return res; }
-function renderSummary(){ const s=computeStats(); document.getElementById('sPlan').textContent=(s.planned/60).toFixed(1)+'h'; document.getElementById('sReal').textContent=(s.actual/60).toFixed(1)+'h'; document.getElementById('sTasks').textContent = s.tasks.total? Math.round(100*s.tasks.done/s.tasks.total)+'%' : '0%'; }
-function init(){ loadStudent(); renderSubjects(); renderTaskSubjects(); renderGrid(); loadWeek(); }
+/* HOME KPIs + Summary */
+function computeStats(){
+  const res={planned:0, actual:0, fixed:0, teachers:0, bySubject:{}, tasks:{done:0,total:0}};
+  const t=loadJSON(KEYS.tasks, {}); Object.keys(t).forEach(k=>{ (t[k]||[]).forEach(it=>{ res.tasks.total++; if(it.done) res.tasks.done++; }); });
+  for(let r=0;r<SLOTS.length;r++){
+    for(let d=0;d<DAYS.length;d++){
+      const td=tbody.children[r]?.children[d+1]; if(!td) continue;
+      const m=metaOf(td); if(!m) continue;
+      res.planned += m.plannedMin||0; res.actual += m.actualMin||0;
+      if(m.type==='fixed') res.fixed += m.plannedMin||0;
+      if(m.type==='teacher' && (r%2===0)) res.teachers++;
+      if(m.subject){ res.bySubject[m.subject] = res.bySubject[m.subject] || {planned:0,actual:0}; res.bySubject[m.subject].planned += m.plannedMin||0; res.bySubject[m.subject].actual += m.actualMin||0; }
+    }
+  }
+  return res;
+}
+function updateHomeKPIs(){
+  const s=computeStats();
+  document.getElementById('kpiPlan').textContent=(s.planned/60).toFixed(1)+'h';
+  document.getElementById('kpiReal').textContent=(s.actual/60).toFixed(1)+'h';
+  document.getElementById('kpiTasks').textContent = s.tasks.total? Math.round(100*s.tasks.done/s.tasks.total)+'%' : '0%';
+  document.getElementById('kpiTeachers').textContent = s.teachers;
+}
+function renderSummary(){ updateHomeKPIs(); renderTeamStats(); }
+function renderTeamStats(){
+  const box=document.getElementById('teamStats'); const members=team(); const t=loadTasks();
+  const stats={}; members.forEach(n=>stats[n]={done:0,total:0,estDone:0});
+  Object.keys(t).forEach(subj=> (t[subj]||[]).forEach(it=>{
+    if(!it.who) return;
+    stats[it.who] = stats[it.who] || {done:0,total:0,estDone:0};
+    stats[it.who].total++; if(it.done){ stats[it.who].done++; stats[it.who].estDone += it.est||0; }
+  }));
+  box.innerHTML='';
+  if(!members.length){ box.textContent='Añade miembros en la pestaña Tareas para ver estadísticas.'; return; }
+  members.forEach(n=>{
+    const s=stats[n]||{done:0,total:0,estDone:0};
+    const row=document.createElement('div'); row.className='toolbar'; row.style.border='1px solid var(--border)'; row.style.borderRadius='10px';
+    row.textContent = `${n}: ${s.done}/${s.total} tareas ✓ · ${s.estDone} h estimadas completadas`;
+    box.appendChild(row);
+  });
+}
+
+/* ------------- Drag & Drop ------------- */
+let drag = null; // {day, startIdx, endIdx, meta, cls, text, ghost}
+function blockRangeAt(td){
+  const day = td.dataset.day; const time = td.dataset.time;
+  const dIdx = dayIndex(day); const row = SLOTS.indexOf(time);
+  const meta=metaOf(td); if(!meta) return null;
+  const cellTag = td.querySelector('.tag'); const cls=(cellTag?.className||'tag t-blue').split(' ').slice(-1)[0];
+  const text=cellTag?.textContent||'';
+  function eq(a,b){ if(!a||!b) return false; return a.type===b.type && a.subject===b.subject && a.teacher===b.teacher && (a.note||'')===(b.note||''); }
+  let start=row, end=row+1;
+  for(let r=row-1;r>=0;r--){ const m=metaOf(tbody.children[r].children[dIdx+1]); if(eq(m,meta)) start=r; else break; }
+  for(let r=row+1;r<SLOTS.length;r++){ const m=metaOf(tbody.children[r].children[dIdx+1]); if(eq(m,meta)) end=r+1; else break; }
+  return {day, dIdx, startIdx:start, endIdx:end, meta, cls, text};
+}
+function startDrag(e){
+  const td = e.target.closest('td'); if(!td) return;
+  const m = metaOf(td); if(!m) return; // only drag blocks
+  const range = blockRangeAt(td); if(!range) return;
+  drag = {...range};
+  drag.ghost = document.createElement('div'); drag.ghost.className='drag-ghost'; drag.ghost.textContent = drag.text;
+  document.body.appendChild(drag.ghost);
+}
+function moveDrag(e){
+  if(!drag) return;
+  drag.ghost.style.transform = `translate(${e.pageX+6}px, ${e.pageY+6}px)`;
+  const cell = document.elementFromPoint(e.clientX, e.clientY)?.closest('td.cell');
+  document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'));
+  if(cell && !cell.classList.contains('locked')) cell.classList.add('drop-target');
+}
+function endDrag(e){
+  if(!drag) return;
+  const cell = document.elementFromPoint(e.clientX, e.clientY)?.closest('td.cell');
+  document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'));
+  if(cell && !cell.classList.contains('locked')){
+    let tgtDay=cell.dataset.day; let tgtTime=cell.dataset.time; let startIdx=SLOTS.indexOf(tgtTime);
+    let slots = drag.endIdx - drag.startIdx;
+    let text = drag.text;
+
+    if(drag.meta.type==='teacher'){
+      const allowed = (['Martes','Jueves'].includes(tgtDay)) ? ['18:00','19:00','20:00'] : (['Sábado','Domingo'].includes(tgtDay) ? ['16:00','17:00','18:00'] : []);
+      if(!allowed.length){ alert('Profesor solo Ma/Ju (18/19/20) o Sa/Do (16/17/18)'); cleanupDrag(); return; }
+      let hour = allowed.find(h=> SLOTS.indexOf(h) >= startIdx) || allowed[0];
+      startIdx = SLOTS.indexOf(hour); text = `${drag.meta.teacher} — ${hour}`; slots=2;
+    }
+    if(hasConflict(tgtDay,startIdx,slots) && !confirm('Conflicto con otros bloques. ¿Sobrescribir?')){ cleanupDrag(); return; }
+
+    const dIdx2=dayIndex(tgtDay);
+    for(let i=0;i<slots;i++){
+      const r=startIdx+i; const td2=tbody.children[r].children[dIdx2+1]; if(!td2||td2.classList.contains('locked')) continue;
+      writeCell(td2, drag.cls, text, {...drag.meta});
+    }
+    // clear origin
+    const dIdx0=dayIndex(drag.day);
+    for(let i=drag.startIdx;i<drag.endIdx;i++){ const td0=tbody.children[i].children[dIdx0+1]; if(td0&&!td0.classList.contains('locked')){ td0.className='cell'; td0.innerHTML=''; } }
+    saveWeek();
+  }
+  cleanupDrag();
+}
+function cleanupDrag(){ if(drag?.ghost) drag.ghost.remove(); drag=null; }
+document.addEventListener('mousedown', (e)=>{ if(e.button!==0) return; startDrag(e); });
+document.addEventListener('mousemove', moveDrag);
+document.addEventListener('mouseup', endDrag);
+
+/* INIT */
+function init(){
+  loadStudent();
+  ensureDefaultSubjects(); renderSubjects(); renderTaskSubjects(); renderTasks();
+  renderGrid(); placeFixedClasses(); loadWeek(); updateHomeKPIs();
+}
 init();
+
+/* ----------- Chatbot (connected via /api/chat) ----------- */
+const FAB = document.getElementById('chatFab'), PANEL=document.getElementById('chatPanel'), CLOSE=document.getElementById('chatClose');
+const MSGS=document.getElementById('chatMsgs'), SEND=document.getElementById('chatSend'), INPUT=document.getElementById('chatInput');
+FAB.addEventListener('click',()=>{ PANEL.style.display='flex'; INPUT.focus(); });
+CLOSE.addEventListener('click',()=>{ PANEL.style.display='none'; });
+function pushMsg(text, who){ const el=document.createElement('div'); el.className='msg '+(who==='me'?'me':'bot'); el.textContent=text; MSGS.appendChild(el); MSGS.scrollTop = MSGS.scrollHeight; }
+function scheduleContextText(){
+  // small context string for the API
+  let lines=[];
+  tbody.querySelectorAll('tr').forEach((tr,rowIdx)=>{
+    DAYS.forEach((day,i)=>{
+      const td = tr.children[i+1]; const tag=td.querySelector('.tag'); if(!tag) return;
+      lines.push(`${day} ${SLOTS[rowIdx]}: ${tag.textContent}`);
+    });
+  });
+  return lines.slice(0,200).join('\\n');
+}
+async function askBot(q){
+  const api = localStorage.getItem('CHAT_API_URL') || 'http://localhost:3000/api/chat';
+  pushMsg(q,'me');
+  try{
+    const messages=[
+      {role:'system', content:'Eres el asistente de Academia Flow. Responde de forma corta y accionable. Conoce las reglas: Profesores (Nuria, Juan Carlos) solo Ma/Ju 18/19/20; Sa/Do 16/17/18.'},
+      {role:'system', content:'Contexto horario:\\n'+scheduleContextText()},
+      {role:'user', content:q}
+    ];
+    const r=await fetch(api,{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({messages})});
+    if(!r.ok) throw new Error('API error '+r.status);
+    const data=await r.json();
+    pushMsg(data.reply || 'Sin respuesta','bot');
+  }catch(err){
+    console.warn(err);
+    pushMsg('No pude conectar al backend. Verifica que `api/server.js` está en marcha.', 'bot');
+  }
+}
+SEND.addEventListener('click',()=>{ const q=INPUT.value.trim(); if(!q) return; INPUT.value=''; askBot(q); });
+INPUT.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); SEND.click(); } });
 </script>
+<button id="installPWA">Instalar app</button>
 </body>
 </html>
